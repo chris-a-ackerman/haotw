@@ -1,0 +1,410 @@
+/* NoticeScreen — overdue determination. Same paper, formal letter posture. */
+
+/* The notice block sits on the home page like a tipped-in slip of stationery. */
+
+.hanotice__main {
+  padding: 22px 24px 0;
+  flex: 1 1 auto;
+}
+
+/* ---------- demo: day selector ---------------------------------- */
+.hanotice__demobar {
+  margin: 14px 0 0;
+  border: 0.5px dashed var(--rule-soft);
+  background: var(--paper-2);
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.hanotice__demobar-l {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 9px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.hanotice__demobar-seg {
+  display: inline-flex;
+  border: 0.5px solid var(--rule-soft);
+  background: #FFFFFF;
+}
+.hanotice__demobar-btn {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  border-left: 0.5px solid var(--rule-soft);
+  padding: 6px 10px;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 9.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  cursor: pointer;
+  transition: color var(--dur-quick) var(--ease-doc),
+              background var(--dur-quick) var(--ease-doc);
+}
+.hanotice__demobar-btn:first-child { border-left: 0; }
+.hanotice__demobar-btn:hover { color: var(--ink); background: var(--baa-blue-tint); }
+.hanotice__demobar-btn.is-active {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+/* ---------- the letter --------------------------------------------- */
+.hanotice__letter {
+  margin-top: 18px;
+  background: #FFFFFF;
+  border: 1px solid var(--ink);
+  position: relative;
+  text-align: center;
+  padding: 0 22px 22px;
+  /* a faint shadow that suggests it sits on the page */
+  box-shadow: 2px 3px 0 rgba(0,0,0,0.05);
+}
+
+/* whole-letter entrance, replays on state change because React re-keys */
+@keyframes hanotice-letter-rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.hanotice__rise-letter {
+  animation: hanotice-letter-rise 0.42s var(--ease-doc) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hanotice__rise-letter { animation: none; }
+}
+
+/* heavy banner: blue rule on top, with a thin yellow accent rule
+   immediately below — the institution's house style. */
+.hanotice__banner {
+  position: relative;
+  margin: -1px -23px 0;
+  height: 12px;
+  background: var(--baa-blue);
+}
+.hanotice__banner::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: -3px;
+  height: 3px;
+  background: var(--baa-yellow);
+}
+
+/* corner stamp: "OVERDUE" or "FORMAL NOTICE" in a tiny inked box */
+.hanotice__stamp {
+  position: absolute;
+  top: 22px;
+  right: 22px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 7px;
+  border: 1px solid currentColor;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 8.5px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--baa-blue);
+  background: #FFFFFF;
+  transform: rotate(-2deg);
+  transform-origin: center;
+}
+.hanotice__stamp--warn { color: var(--status-warn); }
+.hanotice__stamp--err  { color: var(--status-err); }
+.hanotice__stamp-tick {
+  width: 4px;
+  height: 4px;
+  background: currentColor;
+  display: inline-block;
+}
+
+/* salutation block — masthead inside the letter */
+.hanotice__head {
+  padding: 26px 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.hanotice__seal {
+  display: inline-flex;
+}
+.hanotice__office {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 9.5px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--ink);
+  margin-top: 4px;
+}
+.hanotice__office-sub {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 12px;
+  color: var(--ink-3);
+  letter-spacing: 0;
+  margin-top: -2px;
+}
+
+.hanotice__rule {
+  border: 0;
+  border-top: 0.5px solid var(--rule-soft);
+  margin: 16px -22px 0;
+}
+
+/* meta strip — recipient, date, week, ref no */
+.hanotice__meta {
+  margin: 14px 0 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 14px;
+  text-align: left;
+}
+.hanotice__meta-row {
+  display: grid;
+  grid-template-columns: 76px 1fr;
+  gap: 8px;
+  align-items: baseline;
+}
+.hanotice__meta-l {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 8.5px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.hanotice__meta-r {
+  font-family: var(--font-serif);
+  font-size: 12.5px;
+  color: var(--ink);
+  letter-spacing: 0;
+  font-style: italic;
+}
+
+/* the title — centered, with a yellow accent rule below */
+.hanotice__title-block {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 0.5px solid var(--rule-soft);
+}
+.hanotice__overline {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 9.5px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--baa-blue);
+  margin-bottom: 12px;
+}
+.hanotice__title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 26px;
+  line-height: 1.05;
+  letter-spacing: 0.005em;
+  color: var(--ink);
+  text-transform: uppercase;
+  text-wrap: balance;
+  display: inline-block;
+  position: relative;
+  padding-bottom: 12px;
+}
+.hanotice__title::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 56px;
+  height: 3px;
+  background: var(--baa-yellow);
+}
+.hanotice__title--err {
+  color: var(--status-err);
+}
+
+/* the body of the letter */
+.hanotice__body {
+  margin: 22px auto 0;
+  max-width: 32em;
+  font-family: var(--font-serif);
+  font-size: 15.5px;
+  line-height: 1.65;
+  color: var(--ink);
+  letter-spacing: 0.005em;
+  text-wrap: pretty;
+  text-align: center;
+}
+.hanotice__body strong {
+  font-weight: 600;
+  font-style: normal;
+}
+
+/* signature & sign-off */
+.hanotice__signoff {
+  margin: 26px 0 0;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 13px;
+  color: var(--ink-2);
+  letter-spacing: 0;
+}
+.hanotice__signoff-name {
+  display: block;
+  margin-top: 10px;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 22px;
+  letter-spacing: 0;
+  color: var(--ink);
+  line-height: 1;
+}
+.hanotice__signoff-title {
+  display: block;
+  margin-top: 6px;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-style: normal;
+  font-size: 9px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+/* the action — full-width blue button */
+.hanotice__cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  margin-top: 24px;
+  padding: 16px 18px;
+  background: var(--baa-blue);
+  color: #FFFFFF;
+  border: 1px solid var(--baa-blue);
+  border-radius: 1px;
+  text-decoration: none;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  transition: background var(--dur-base) var(--ease-doc),
+              transform var(--dur-quick) var(--ease-doc);
+}
+.hanotice__cta:hover { background: var(--baa-blue-ink); }
+.hanotice__cta:active { transform: translateY(1px); }
+.hanotice__cta-arrow {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: 18px;
+  letter-spacing: 0;
+}
+
+/* foot meta — counter/ref number under the button */
+.hanotice__foot {
+  margin: 14px -22px 0;
+  padding: 12px 22px 0;
+  border-top: 0.5px solid var(--rule-soft);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 8.5px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.hanotice__counter {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 11px;
+  color: var(--ink);
+  letter-spacing: 0.05em;
+}
+.hanotice__counter--err { color: var(--status-err); }
+.hanotice__counter--warn { color: var(--status-warn); }
+
+/* --- variant: 5+ days, more severe ---------------------------------- */
+.hanotice__letter--err .hanotice__banner {
+  background: var(--status-err);
+}
+.hanotice__letter--err .hanotice__title {
+  color: var(--status-err);
+}
+.hanotice__letter--err .hanotice__title::after {
+  background: var(--baa-yellow);
+}
+
+/* awaiting state — when the viewer is the membership, not the champion.
+   Same footprint as the CTA but quiet, deadpan, no action. */
+.hanotice__await {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 6px 12px;
+  width: 100%;
+  margin-top: 24px;
+  padding: 14px 16px;
+  border: 1px solid var(--rule-soft);
+  background: var(--paper-2);
+  text-align: left;
+}
+.hanotice__await-dot {
+  grid-row: 1 / span 2;
+  width: 8px;
+  height: 8px;
+  background: var(--baa-blue);
+  border-radius: 50%;
+  display: inline-block;
+  animation: hanotice-pulse 1.6s var(--ease-doc) infinite;
+}
+@keyframes hanotice-pulse {
+  0%, 100% { opacity: 0.35; }
+  50%      { opacity: 1; }
+}
+.hanotice__await-l {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--baa-blue);
+}
+.hanotice__await-r {
+  grid-column: 2;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--ink-2);
+  letter-spacing: 0;
+}
+
+/* small note under the letter — colophon-style */
+.hanotice__notebelow {
+  margin: 16px 0 0;
+  text-align: center;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 12px;
+  color: var(--ink-3);
+  letter-spacing: 0;
+}
+
+/* ---------- mobile micro-adjust --------------------------------- */
+@media (max-width: 360px) {
+  .hanotice__title { font-size: 22px; }
+  .hanotice__body { font-size: 14.5px; }
+  .hanotice__stamp { top: 16px; right: 16px; }
+}

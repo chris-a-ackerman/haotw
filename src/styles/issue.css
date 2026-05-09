@@ -1,0 +1,771 @@
+/* IssueScreen — institutional form. Same paper, same rules. */
+
+/* ---------- title block ----------------------------------------- */
+.haissue__main {
+  padding-bottom: 28px;
+}
+
+.haissue__title-block {
+  margin-top: 4px;
+}
+
+.haissue__overline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 9px;
+  background: var(--baa-blue);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  border-radius: 1px;
+}
+.haissue__overline-tick {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 13px;
+  letter-spacing: 0;
+  line-height: 0.9;
+  color: var(--baa-yellow);
+}
+.haissue__overline-no {
+  color: rgba(255,255,255,0.7);
+  letter-spacing: 0.18em;
+}
+
+.haissue__title {
+  margin: 14px 0 0;
+  font-family: var(--font-sans);
+  font-weight: 800;
+  font-size: 28px;
+  line-height: 1.0;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--baa-blue);
+}
+
+.haissue__subtitle {
+  margin: 8px 0 0;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: var(--ink-3);
+  letter-spacing: 0;
+}
+
+/* ---------- back link in folio ---------------------------------- */
+.haissue__back {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 9.5px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: color var(--dur-quick) var(--ease-doc);
+}
+.haissue__back:hover { color: var(--baa-blue); }
+.haissue__back-arrow {
+  font-family: var(--font-serif);
+  font-size: 14px;
+  letter-spacing: 0;
+}
+
+/* ---------- section scaffolding --------------------------------- */
+.haissue__section {
+  margin-top: 28px;
+}
+.haissue__section--submit { margin-top: 22px; }
+
+.haissue__sectionhead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--ink);
+  margin-bottom: 14px;
+}
+.haissue__sectionhead-l {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 10px;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 10.5px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.haissue__sectionhead-mark {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0;
+  color: var(--baa-blue);
+}
+.haissue__sectionhead-r {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 9.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+/* ---------- recipient grid -------------------------------------- */
+.haissue__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px 10px;
+}
+
+.haissue__card {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 8px 4px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  position: relative;
+  transition: transform var(--dur-quick) var(--ease-doc),
+              opacity var(--dur-base) var(--ease-doc);
+}
+.haissue__card:hover .haissue__avatar {
+  border-color: var(--baa-blue);
+}
+.haissue__card.is-selected {
+  transform: scale(0.965);
+}
+.haissue__card.is-selected .haissue__avatar {
+  box-shadow: 0 0 0 3px var(--baa-blue);
+  border-color: var(--baa-blue);
+  background:
+    repeating-linear-gradient(0deg, transparent 0 5px, var(--baa-blue-tint) 5px 5.5px),
+    var(--baa-blue-tint);
+  color: var(--baa-blue-ink);
+}
+.haissue__card.is-selected .haissue__card-name {
+  color: var(--baa-blue);
+}
+.haissue__card.is-you {
+  cursor: not-allowed;
+  opacity: 0.32;
+}
+.haissue__card.is-you:hover .haissue__avatar {
+  border-color: var(--ink);
+}
+
+.haissue__card-avatar-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.haissue__avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid var(--ink);
+  /* horizontal hairlines like a passport photo */
+  background:
+    repeating-linear-gradient(0deg, transparent 0 5px, var(--rule-soft) 5px 5.5px),
+    var(--paper-2);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-style: italic;
+  color: var(--ink);
+  letter-spacing: 0.02em;
+  transition: box-shadow var(--dur-base) var(--ease-doc),
+              background var(--dur-base) var(--ease-doc),
+              border-color var(--dur-quick) var(--ease-doc),
+              color var(--dur-base) var(--ease-doc);
+}
+.haissue__avatar-initials {
+  position: relative;
+  top: 1px;
+}
+
+.haissue__card-check {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--baa-blue);
+  border: 1.5px solid var(--paper);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  animation: haissue-check-in 0.18s var(--ease-doc) both;
+}
+@keyframes haissue-check-in {
+  from { transform: scale(0.4); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+
+.haissue__card-name {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 9.5px;
+  line-height: 1.25;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--ink-2);
+  transition: color var(--dur-base) var(--ease-doc);
+}
+.haissue__card-you {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 11px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink-3);
+}
+
+.haissue__co-note {
+  margin: 14px 0 0;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 13px;
+  color: var(--baa-blue);
+  letter-spacing: 0;
+  text-align: center;
+  animation: haissue-rise 0.4s var(--ease-doc) both;
+}
+.haissue__deny-note {
+  margin: 4px 0 0;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 12px;
+  color: var(--status-err);
+  letter-spacing: 0;
+  text-align: center;
+  animation: haissue-rise 0.3s var(--ease-doc) both;
+}
+
+/* ---------- textarea -------------------------------------------- */
+.haissue__textarea-wrap {
+  border: 1px solid var(--ink);
+  background: #FFFFFF;
+}
+.haissue__textarea {
+  display: block;
+  width: 100%;
+  border: 0;
+  padding: 12px 14px;
+  background: transparent;
+  font-family: var(--font-serif);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink);
+  resize: vertical;
+  min-height: 160px;
+  letter-spacing: 0.005em;
+  outline: none;
+  /* faint ruling, like a ledger page */
+  background-image: repeating-linear-gradient(
+    transparent 0 22.5px,
+    var(--rule-soft) 22.5px 23px
+  );
+  background-position: 0 13px;
+}
+.haissue__textarea::placeholder {
+  color: var(--ink-3);
+  font-style: italic;
+}
+.haissue__textarea:focus {
+  background-color: #FFFFFF;
+}
+.haissue__textarea:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.haissue__textarea-foot {
+  border-top: 0.5px solid var(--rule-soft);
+  padding: 6px 12px;
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 9.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+/* ---------- buttons --------------------------------------------- */
+.haissue__btn {
+  appearance: none;
+  border: 1px solid var(--ink);
+  border-radius: 1px;
+  padding: 14px 18px;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background var(--dur-base) var(--ease-doc),
+              color var(--dur-base) var(--ease-doc),
+              transform var(--dur-quick) var(--ease-doc),
+              opacity var(--dur-base) var(--ease-doc);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.haissue__btn:active:not(:disabled) { transform: translateY(1px); }
+.haissue__btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.haissue__btn--primary {
+  background: var(--baa-blue);
+  color: #fff;
+  border-color: var(--baa-blue);
+}
+.haissue__btn--primary:hover:not(:disabled) {
+  background: var(--baa-blue-ink);
+}
+.haissue__btn--primary:disabled {
+  background: var(--paper-2);
+  color: var(--ink-3);
+  border-color: var(--rule-soft);
+  opacity: 1;
+}
+
+.haissue__btn--ghost {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--ink);
+}
+.haissue__btn--ghost:hover:not(:disabled) {
+  background: var(--paper-2);
+}
+
+.haissue__btn--full {
+  width: 100%;
+}
+.haissue__btn--submit {
+  background: var(--baa-blue);
+  color: #fff;
+  padding: 16px 18px;
+  position: relative;
+}
+.haissue__btn--submit:disabled {
+  background: var(--paper-2);
+  color: var(--ink-3);
+  border-color: var(--rule-soft);
+}
+.haissue__btn-arrow {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: 18px;
+  letter-spacing: 0;
+  margin-left: 4px;
+}
+
+.haissue__btn-loading {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  letter-spacing: 0.18em;
+}
+.haissue__dots {
+  display: inline-flex;
+  margin-left: 2px;
+}
+.haissue__dots span {
+  animation: haissue-dot 1.2s var(--ease-doc) infinite;
+  display: inline-block;
+}
+.haissue__dots span:nth-child(2) { animation-delay: 0.18s; }
+.haissue__dots span:nth-child(3) { animation-delay: 0.36s; }
+@keyframes haissue-dot {
+  0%, 60%, 100% { opacity: 0.2; transform: translateY(0); }
+  30%           { opacity: 1;   transform: translateY(-1px); }
+}
+
+/* ---------- generated certificate panel ------------------------- */
+.haissue__cert-panel {
+  margin-top: 14px;
+  border: 0.5px solid var(--rule-soft);
+  background: var(--paper-2);
+}
+.haissue__cert-panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  border-bottom: 0.5px solid var(--rule-soft);
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 9.5px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+.haissue__cert-panel-status {
+  color: var(--baa-blue);
+  letter-spacing: 0.16em;
+}
+.haissue__cert-panel-body {
+  padding: 14px 16px;
+  font-family: var(--font-serif);
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--ink);
+  letter-spacing: 0.005em;
+  min-height: 84px;
+}
+
+.haissue__cert-skeleton {
+  display: block;
+}
+.haissue__cert-skeleton span {
+  display: block;
+  height: 10px;
+  margin: 6px 0;
+  background: linear-gradient(90deg,
+    var(--rule-soft) 0%,
+    rgba(201,199,191,0.35) 50%,
+    var(--rule-soft) 100%);
+  background-size: 200% 100%;
+  animation: haissue-skel 1.4s var(--ease-doc) infinite;
+}
+.haissue__cert-skeleton span:nth-child(2) { width: 92%; }
+.haissue__cert-skeleton span:nth-child(3) { width: 86%; }
+.haissue__cert-skeleton span:nth-child(4) { width: 62%; }
+@keyframes haissue-skel {
+  0% { background-position: 0% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.haissue__regen {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  border-top: 0.5px solid var(--rule-soft);
+  width: 100%;
+  padding: 10px 12px;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--baa-blue);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+}
+.haissue__regen:hover { background: var(--baa-blue-tint); }
+
+/* ---------- certificate preview --------------------------------- */
+.haissue__certpaper {
+  position: relative;
+  background: #FFFFFF;
+  border: 1px solid var(--ink);
+  padding: 16px 18px 14px;
+  box-shadow: 2px 3px 0 rgba(0,0,0,0.05);
+  /* a faint corner stamp */
+}
+.haissue__certpaper-rule {
+  height: 0;
+  border-top: 2px solid var(--baa-blue);
+  margin: -1px -19px 12px;
+  position: relative;
+}
+.haissue__certpaper-rule::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; top: 4px;
+  border-top: 0.5px solid var(--baa-blue);
+}
+.haissue__certpaper-rule--mid {
+  margin: 12px 0;
+  border-top: 0.5px solid var(--rule-soft);
+}
+.haissue__certpaper-rule--mid::after { content: none; }
+
+.haissue__certpaper-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 9px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.haissue__certpaper-est {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 10px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink-3);
+}
+
+.haissue__certpaper-title {
+  margin-top: 8px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 1.05;
+  letter-spacing: -0.005em;
+  color: var(--ink);
+  text-align: center;
+}
+.haissue__certpaper-folio {
+  margin-top: 4px;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 8.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+.haissue__certpaper-inre {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 9px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--baa-blue);
+}
+.haissue__certpaper-name {
+  margin-top: 2px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 22px;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+.haissue__certpaper-body {
+  margin: 10px 0 0;
+  font-family: var(--font-serif);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ink);
+  letter-spacing: 0.005em;
+  text-wrap: pretty;
+}
+.haissue__certpaper-empty {
+  color: var(--ink-3);
+  font-style: italic;
+}
+
+.haissue__certpaper-foot {
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 0.5px solid var(--rule-soft);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 12px;
+}
+.haissue__certpaper-sigline {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.haissue__certpaper-siglabel {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 8.5px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.haissue__certpaper-signame {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 13px;
+  color: var(--ink);
+  border-top: 0.5px solid var(--ink);
+  padding-top: 2px;
+  min-width: 130px;
+}
+.haissue__certpaper-seal {
+  flex: 0 0 auto;
+}
+
+.haissue__preview-caption {
+  margin: 10px 0 0;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 12px;
+  color: var(--ink-3);
+  text-align: center;
+  letter-spacing: 0;
+}
+
+/* ---------- view-record link button (post-filing) -------------- */
+.haissue__btn--view-record {
+  margin-top: 16px;
+  text-decoration: none;
+  background: var(--paper);
+  color: var(--ink);
+  border-color: var(--ink);
+  position: relative;
+  animation: haissue-rise-modal 0.42s var(--ease-doc) both;
+  animation-delay: 0.18s;
+}
+.haissue__btn--view-record:hover {
+  background: var(--paper-2);
+}
+.haissue__btn--view-record .haissue__btn-numeral {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: 14px;
+  letter-spacing: 0;
+  color: var(--baa-blue);
+  margin-right: 2px;
+}
+
+/* ---------- filed note ------------------------------------------ */
+.haissue__filed-note {
+  margin: 12px 0 0;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 12.5px;
+  color: var(--ink-2);
+  text-align: center;
+  letter-spacing: 0;
+}
+
+/* ---------- modal ----------------------------------------------- */
+.haissue__modal-scrim {
+  position: fixed;
+  inset: 0;
+  background: rgba(26, 26, 26, 0.42);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 100;
+  animation: haissue-fade 0.22s var(--ease-doc) both;
+}
+.haissue__modal {
+  width: 100%;
+  max-width: 390px;
+  background: var(--paper);
+  border: 1px solid var(--ink);
+  border-bottom: 0;
+  padding: 22px 22px 24px;
+  position: relative;
+  animation: haissue-rise-modal 0.28s var(--ease-doc) both;
+}
+.haissue__modal::before {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; top: 0;
+  border-top: 3px solid var(--baa-blue);
+}
+.haissue__modal::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; top: 5px;
+  border-top: 0.5px solid var(--baa-blue);
+}
+.haissue__modal-stamp {
+  display: inline-block;
+  margin-top: 8px;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 9px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--baa-blue);
+  border: 1px solid var(--baa-blue);
+  padding: 3px 7px;
+}
+.haissue__modal-title {
+  margin: 12px 0 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.haissue__modal-body {
+  margin: 10px 0 0;
+  font-family: var(--font-serif);
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ink);
+  letter-spacing: 0.005em;
+}
+.haissue__modal-body strong {
+  font-weight: 600;
+  font-style: italic;
+}
+.haissue__modal-body--quiet {
+  color: var(--ink-2);
+  font-style: italic;
+}
+.haissue__modal-actions {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+@keyframes haissue-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes haissue-rise-modal {
+  from { transform: translateY(24px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+/* ---------- colophon -------------------------------------------- */
+.haissue__colophon {
+  margin-top: 26px;
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 8.5px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  padding-top: 14px;
+  border-top: 0.5px solid var(--rule-soft);
+}
+
+/* ---------- mobile micro-adjust --------------------------------- */
+@media (max-width: 360px) {
+  .haissue__avatar { width: 56px !important; height: 56px !important; font-size: 18px !important; }
+  .haissue__title { font-size: 24px; }
+}

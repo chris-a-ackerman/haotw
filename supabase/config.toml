@@ -1,0 +1,48 @@
+# Supabase local-dev config. The CLI (`supabase init`) regenerates this on
+# first run if it doesn't exist; we ship a minimal version so `supabase start`
+# works out of the box and hosts the values src/lib/supabase.js expects when
+# the dev server is reading from a local stack.
+
+project_id = "haotw"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "storage", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+shadow_port = 54320
+major_version = 15
+
+[studio]
+enabled = true
+port = 54323
+api_url = "http://127.0.0.1:54321"
+
+[auth]
+enabled = true
+site_url = "http://localhost:5173"
+additional_redirect_urls = ["http://localhost:5173"]
+jwt_expiry = 3600
+enable_signup = true
+
+[auth.email]
+enable_signup = true
+enable_confirmations = false  # set to true in production
+
+# Configure providers per environment via the dashboard; this stub is here so
+# `supabase functions serve` doesn't error on missing config.
+[auth.external.google]
+enabled = false
+client_id = ""
+secret = ""
+
+[functions.generate-certificate]
+verify_jwt = true
+
+[storage]
+enabled = true
+file_size_limit = "50MiB"

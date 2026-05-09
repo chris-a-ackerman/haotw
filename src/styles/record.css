@@ -1,0 +1,506 @@
+/* RecordScreen — Official Record. The register, in reverse-chronological order. */
+
+/* ---------- certificate CTA inside expanded speech ---------------- */
+.harec__cert-cta {
+  appearance: none;
+  background: var(--paper);
+  color: var(--ink);
+  border: 1px solid var(--ink);
+  border-radius: 1px;
+  width: 100%;
+  margin: 18px 0 4px;
+  padding: 14px 14px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  text-align: left;
+  text-decoration: none;
+  transition: background var(--dur-quick) var(--ease-doc),
+              transform var(--dur-quick) var(--ease-doc);
+}
+.harec__cert-cta:hover { background: var(--baa-blue-tint); }
+.harec__cert-cta:active { transform: translateY(1px); }
+.harec__cert-cta-mark {
+  width: 22px; height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--baa-blue);
+}
+.harec__cert-cta-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.harec__cert-cta-l {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.harec__cert-cta-meta {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 12px;
+  letter-spacing: 0;
+  color: var(--ink-3);
+  text-transform: none;
+}
+.harec__cert-cta-arrow {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: 18px;
+  color: var(--baa-blue);
+}
+
+.harec {
+  width: 100%;
+  max-width: var(--app-col-max);
+  min-height: 100vh;
+  background: var(--paper);
+  color: var(--ink);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 1px 0 0 rgba(0,0,0,0.04), -1px 0 0 rgba(0,0,0,0.04);
+  margin: 0 auto;
+  padding-bottom: 24px;
+}
+
+/* ---------- masthead --------------------------------------------- */
+.harec__masthead {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 16px var(--app-pad-x) 8px;
+  gap: 8px;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: var(--paper);
+  border-bottom: 1px solid var(--ink);
+}
+.harec__back {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 9.5px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  justify-self: start;
+  transition: color var(--dur-quick) var(--ease-doc);
+}
+.harec__back:hover { color: var(--baa-blue); }
+.harec__back-arrow {
+  font-family: var(--font-serif);
+  font-size: 14px;
+  letter-spacing: 0;
+}
+.harec__wordmark {
+  justify-self: center;
+}
+.harec__wordmark-text {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.harec__folio-r {
+  justify-self: end;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 9.5px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+.harec__rule {
+  border: 0;
+  border-top: 1px solid var(--ink);
+  margin: 0;
+  width: 100%;
+}
+.harec__rule--top { display: none; } /* the masthead's border-bottom replaces this */
+.harec__rule--banner {
+  border-top: 2px solid var(--ink);
+  position: relative;
+  margin: 6px 0 0;
+}
+
+/* ---------- header (the title block) ----------------------------- */
+.harec__header {
+  padding: 22px var(--app-pad-x) 14px;
+}
+.harec__overline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--baa-blue);
+}
+.harec__overline-tick {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 14px;
+  letter-spacing: 0;
+  color: var(--baa-yellow);
+  -webkit-text-stroke: 0.5px var(--ink);
+  paint-order: stroke fill;
+}
+.harec__title {
+  margin: 8px 0 0;
+  font-family: var(--font-sans);
+  font-weight: 800;
+  font-size: 30px;
+  line-height: 1.0;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--baa-blue);
+}
+.harec__subtitle {
+  margin: 8px 0 0;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--ink-3);
+  letter-spacing: 0;
+}
+.harec__meta-row {
+  margin-top: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 9.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.harec__meta-dot { opacity: 0.55; letter-spacing: 0; }
+
+/* ---------- list ------------------------------------------------- */
+.harec__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* ---------- entry ------------------------------------------------ */
+.harec__entry {
+  position: relative;
+  padding: 22px var(--app-pad-x) 22px;
+  border-bottom: 0.5px solid var(--rule-soft);
+}
+.harec__entry:last-of-type {
+  border-bottom: 1px solid var(--ink);
+}
+.harec__entry.is-current {
+  background: linear-gradient(
+    to right,
+    rgba(0, 61, 165, 0.04) 0,
+    rgba(0, 61, 165, 0.0) 60%
+  );
+  padding-left: 27px;
+}
+.harec__entry.is-current::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--baa-blue);
+}
+.harec__entry.is-current::after {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  border-left: 0.5px solid var(--baa-blue);
+}
+
+.harec__entry-head {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.harec__week {
+  display: inline-block;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 9.5px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--baa-blue);
+  padding: 3px 7px;
+  border: 0.5px solid var(--baa-blue);
+  border-radius: 1px;
+  background: rgba(0, 61, 165, 0.04);
+}
+.harec__week.is-current {
+  background: var(--baa-blue);
+  color: #fff;
+  border-color: var(--baa-blue);
+  letter-spacing: 0.22em;
+}
+
+.harec__co {
+  display: inline-block;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink);
+  padding: 3px 7px;
+  background: var(--baa-yellow);
+  border: 0.5px solid var(--ink);
+  border-radius: 1px;
+}
+
+.harec__name {
+  margin: 12px 0 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 26px;
+  line-height: 1.05;
+  letter-spacing: -0.018em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+.harec__entry.is-current .harec__name {
+  font-size: 30px;
+}
+
+.harec__by {
+  margin-top: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 9.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.harec__by-dot { opacity: 0.55; letter-spacing: 0; }
+
+.harec__cite {
+  margin: 12px 0 0;
+  font-family: var(--font-serif);
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--ink);
+  letter-spacing: 0.005em;
+  text-wrap: pretty;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.harec__cite.is-open {
+  display: block;
+  -webkit-line-clamp: unset;
+  overflow: visible;
+}
+
+.harec__more {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 10px 0 0;
+  margin: 0;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--baa-blue);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: color var(--dur-quick) var(--ease-doc);
+}
+.harec__more:hover { color: var(--baa-blue-ink); }
+.harec__more-arrow {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: 14px;
+  letter-spacing: 0;
+}
+
+/* ---------- speech (expanded) ------------------------------------ */
+/* grid-template-rows 0fr -> 1fr trick: animates intrinsic height. */
+.harec__speech-grid {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.42s var(--ease-doc),
+              opacity 0.32s var(--ease-doc);
+  opacity: 0;
+}
+.harec__speech-grid.is-open {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+.harec__speech-grid-inner {
+  overflow: hidden;
+  min-height: 0;
+}
+
+.harec__speech {
+  margin-top: 14px;
+  padding: 16px 16px 14px;
+  background: var(--paper-2);
+  border-top: 0.5px solid var(--ink);
+  border-bottom: 0.5px solid var(--ink);
+  position: relative;
+}
+.harec__speech::before {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; top: 3px;
+  border-top: 0.5px solid var(--ink);
+}
+
+.harec__speech-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 9px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--ink);
+  padding-bottom: 8px;
+  border-bottom: 0.5px solid var(--rule-soft);
+}
+.harec__speech-folio {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 10.5px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink-3);
+}
+
+.harec__speech-p {
+  margin: 12px 0 0;
+  font-family: var(--font-serif);
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--ink);
+  letter-spacing: 0.005em;
+  text-wrap: pretty;
+}
+.harec__speech-p--lede {
+  margin-top: 14px;
+}
+.harec__speech-p--lede::first-letter {
+  font-family: var(--font-display);
+  font-weight: 700;
+  float: left;
+  font-size: 3.0em;
+  line-height: 0.85;
+  padding: 4px 8px 0 0;
+  color: var(--baa-blue);
+}
+
+/* ---------- end of record ---------------------------------------- */
+.harec__endmark {
+  margin: 22px var(--app-pad-x) 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 9.5px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.harec__endmark span:first-child,
+.harec__endmark span:last-child {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 14px;
+  letter-spacing: 0;
+  color: var(--baa-blue);
+}
+
+.harec__colophon {
+  display: flex;
+  justify-content: space-between;
+  padding: 18px 24px 0;
+  margin-top: 14px;
+  border-top: 0.5px solid var(--rule-soft);
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 8.5px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+/* ---------- mobile micro-adjust ---------------------------------- */
+@media (max-width: 360px) {
+  .harec__title { font-size: 26px; }
+  .harec__entry.is-current .harec__name { font-size: 26px; }
+  .harec__name { font-size: 22px; }
+}
+
+/* ---------- entrance: ink settling, not a sport ----------------- */
+@keyframes harec-rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes harec-draw {
+  from { opacity: 0; transform: scaleX(0); }
+  to   { opacity: 1; transform: scaleX(1); }
+}
+.harec__rise {
+  opacity: 0;
+  animation: harec-rise 0.6s var(--ease-doc) both;
+}
+.harec__draw {
+  opacity: 0;
+  transform-origin: left center;
+  animation: harec-draw 0.7s var(--ease-doc) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .harec__rise, .harec__draw {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+  .harec__speech-grid { transition: none; }
+}

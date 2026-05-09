@@ -1,0 +1,223 @@
+/* App-level chrome: hamburger button, slide-in drawer, scrim. */
+
+/* ---------- hamburger button ----------------------------------------- */
+.happs-hamburger {
+  position: fixed;
+  top: 13px;
+  /* Track the right edge of the document column at any breakpoint. On
+     wider viewports, the column is centered, so the hamburger sits 18px
+     inside its right edge; on phones the column is full-width, so we
+     pin it to the viewport edge instead. */
+  right: max(18px, calc(50vw - var(--app-col-max) / 2 + 18px));
+  width: 28px;
+  height: 28px;
+  background: var(--paper);
+  border: 1px solid var(--ink);
+  border-radius: 1px;
+  cursor: pointer;
+  z-index: 90;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 0;
+  transition: background var(--dur-quick) var(--ease-doc),
+              transform var(--dur-quick) var(--ease-doc);
+}
+.happs-hamburger:hover { background: var(--baa-blue-tint); }
+.happs-hamburger:active { transform: translateY(1px); }
+.happs-hamburger-tick {
+  display: none;
+}
+.happs-hamburger-rules {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.happs-hamburger-rules span {
+  display: block;
+  width: 14px;
+  height: 1px;
+  background: var(--ink);
+}
+.happs-hamburger-rules span:nth-child(2) {
+  background: var(--baa-blue);
+  height: 1.5px;
+}
+
+/* legacy mobile fallback — the max() above already covers small screens */
+
+/* ---------- scrim ---------------------------------------------------- */
+.happs-scrim {
+  position: fixed;
+  inset: 0;
+  background: rgba(26, 26, 26, 0.42);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur-base) var(--ease-doc);
+  z-index: 100;
+}
+.happs-scrim.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ---------- drawer --------------------------------------------------- */
+.happs-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  width: min(86vw, 340px);
+  background: var(--paper);
+  border-left: 1px solid var(--ink);
+  z-index: 110;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.34s var(--ease-doc);
+  box-shadow: -4px 0 0 rgba(0,0,0,0.04);
+}
+.happs-drawer.is-open {
+  transform: translateX(0);
+}
+
+.happs-drawer-banner {
+  height: 3px;
+  background: var(--baa-blue);
+  position: relative;
+}
+.happs-drawer-banner::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; top: 5px;
+  border-top: 0.5px solid var(--baa-blue);
+}
+
+.happs-drawer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px 12px;
+}
+.happs-drawer-office {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.happs-drawer-close {
+  appearance: none;
+  background: transparent;
+  border: 1px solid var(--ink);
+  border-radius: 1px;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: 22px;
+  line-height: 1;
+  color: var(--ink);
+  padding: 0 0 2px;
+  transition: background var(--dur-quick) var(--ease-doc);
+}
+.happs-drawer-close:hover { background: var(--baa-blue-tint); }
+
+.happs-drawer-rule {
+  border: 0;
+  border-top: 1px solid var(--ink);
+  margin: 0 20px;
+}
+
+.happs-drawer-overline {
+  margin: 18px 20px 12px;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 9.5px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.happs-drawer-list {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 12px;
+  display: flex;
+  flex-direction: column;
+}
+.happs-drawer-row {
+  border-top: 0.5px solid var(--rule-soft);
+}
+.happs-drawer-row:last-child {
+  border-bottom: 0.5px solid var(--rule-soft);
+}
+.happs-drawer-item {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 32px 1fr 22px;
+  align-items: baseline;
+  gap: 10px;
+  padding: 16px 20px;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  transition: background var(--dur-quick) var(--ease-doc),
+              color var(--dur-quick) var(--ease-doc);
+}
+.happs-drawer-item:hover {
+  background: var(--baa-blue-tint);
+  color: var(--baa-blue);
+}
+.happs-drawer-item.is-active {
+  color: var(--baa-blue);
+  background: var(--baa-blue-tint);
+}
+.happs-drawer-numeral {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 600;
+  font-size: 16px;
+  letter-spacing: 0;
+  color: var(--baa-blue);
+}
+.happs-drawer-label {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 11.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+.happs-drawer-arrow {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-3);
+  text-align: right;
+}
+.happs-drawer-item.is-active .happs-drawer-arrow {
+  color: var(--baa-blue);
+}
+
+.happs-drawer-foot {
+  margin-top: auto;
+  padding: 14px 20px 22px;
+  display: flex;
+  justify-content: space-between;
+  border-top: 0.5px solid var(--rule-soft);
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 8.5px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}

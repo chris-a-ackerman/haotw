@@ -1,0 +1,689 @@
+/* Account sheet — opens from the drawer profile row.
+   Sits above the drawer (z-index 130), with its own scrim. */
+
+/* ---------- drawer profile row (now a button) ----------------------- */
+.happs-drawer-account {
+  padding: 14px 20px 14px;
+  border-top: 0.5px solid var(--rule-soft);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.happs-drawer-account-row {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 4px 6px 4px 4px;
+  margin: -4px -6px -4px -4px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1 1 auto;
+  min-width: 0;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  border-radius: 1px;
+  transition: background var(--dur-quick) var(--ease-doc);
+  position: relative;
+}
+.happs-drawer-account-row:hover {
+  background: var(--baa-blue-tint);
+}
+.happs-drawer-account-row:focus-visible {
+  outline: 1px solid var(--baa-blue);
+  outline-offset: 2px;
+}
+.happs-drawer-account-hint {
+  display: block;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 8.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--baa-blue);
+  margin-top: 2px;
+}
+.happs-drawer-account-hint span {
+  display: inline-block;
+  margin-left: 2px;
+  transition: transform var(--dur-quick) var(--ease-doc);
+}
+.happs-drawer-account-row:hover .happs-drawer-account-hint span {
+  transform: translateX(2px);
+}
+.happs-drawer-account-arrow {
+  display: none;
+}
+
+/* ---------- scrim + sheet ------------------------------------------- */
+.haaccount__scrim {
+  position: fixed;
+  inset: 0;
+  background: rgba(26, 26, 26, 0.52);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur-base) var(--ease-doc);
+  z-index: 120;
+}
+.haaccount__scrim.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.haaccount {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(96vw, 460px);
+  background: var(--paper);
+  border-left: 1px solid var(--ink);
+  z-index: 130;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.36s var(--ease-doc);
+  box-shadow: -10px 0 0 rgba(0,0,0,0.04);
+}
+.haaccount.is-open { transform: translateX(0); }
+
+.haaccount__banner {
+  height: 3px;
+  background: var(--baa-blue);
+  position: relative;
+  flex: 0 0 auto;
+}
+.haaccount__banner::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; top: 5px;
+  border-top: 0.5px solid var(--baa-blue);
+}
+
+.haaccount__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px 12px;
+  flex: 0 0 auto;
+}
+.haaccount__office {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.haaccount__close {
+  appearance: none;
+  background: transparent;
+  border: 1px solid var(--ink);
+  border-radius: 1px;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: 22px;
+  line-height: 1;
+  color: var(--ink);
+  padding: 0 0 2px;
+  transition: background var(--dur-quick) var(--ease-doc);
+}
+.haaccount__close:hover { background: var(--baa-blue-tint); }
+
+.haaccount__rule {
+  border: 0;
+  border-top: 1px solid var(--ink);
+  margin: 0 24px;
+  flex: 0 0 auto;
+}
+.haaccount__rule--soft {
+  border-top: 0.5px dashed var(--rule-soft);
+  margin: 12px 24px;
+}
+
+.haaccount__scroll {
+  overflow-y: auto;
+  padding: 18px 24px 24px;
+  flex: 1 1 auto;
+}
+
+/* ---------- hero / member identity --------------------------------- */
+.haaccount__hero {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  padding: 6px 0 18px;
+  border-bottom: 0.5px solid var(--rule-soft);
+  margin-bottom: 22px;
+}
+.haaccount__hero-disc {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--paper-2);
+  border: 0.5px solid var(--rule-soft);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 600;
+  font-size: 24px;
+  color: var(--ink-2);
+  flex: 0 0 auto;
+}
+.haaccount__hero-disc img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* portrait control (button-disc + affix/strike actions) */
+.haaccount__portrait {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+.haaccount__hero-disc--button {
+  appearance: none;
+  border: 0.5px solid var(--rule-soft);
+  padding: 0;
+  cursor: pointer;
+  position: relative;
+  font: inherit;
+  color: inherit;
+  transition: border-color var(--dur-quick) var(--ease-doc),
+              transform var(--dur-quick) var(--ease-doc);
+}
+.haaccount__hero-disc--button:hover {
+  border-color: var(--baa-blue);
+}
+.haaccount__hero-disc--button:focus-visible {
+  outline: 1px solid var(--baa-blue);
+  outline-offset: 2px;
+}
+.haaccount__hero-disc--button > span:not(.haaccount__portrait-overlay) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+.haaccount__portrait-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  background: rgba(26, 26, 26, 0.62);
+  color: var(--paper);
+  opacity: 0;
+  transition: opacity var(--dur-quick) var(--ease-doc);
+  border-radius: 50%;
+}
+.haaccount__hero-disc--button:hover .haaccount__portrait-overlay,
+.haaccount__hero-disc--button:focus-visible .haaccount__portrait-overlay {
+  opacity: 1;
+}
+.haaccount__portrait-overlay-mark {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1;
+}
+.haaccount__portrait-overlay-text {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 8px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+.haaccount__portrait-file {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+  clip: rect(0 0 0 0);
+}
+.haaccount__portrait-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  gap: 4px 6px;
+  max-width: 96px;
+  text-align: center;
+}
+.haaccount__portrait-link {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 8.5px;
+  letter-spacing: 0.20em;
+  text-transform: uppercase;
+  color: var(--baa-blue);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 0.5px;
+}
+.haaccount__portrait-link:hover { color: var(--baa-blue-ink); }
+.haaccount__portrait-link--strike { color: var(--ink-3); }
+.haaccount__portrait-link--strike:hover { color: var(--status-err); }
+.haaccount__portrait-sep {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--ink-3);
+}
+.haaccount__portrait-error {
+  flex: 1 0 100%;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 11px;
+  color: var(--status-err);
+}
+.haaccount__portrait-filed {
+  flex: 1 0 100%;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 11px;
+  color: var(--status-ok);
+}
+.haaccount__hero-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.haaccount__hero-overline {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 9px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.haaccount__hero-name {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 22px;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  line-height: 1.1;
+}
+.haaccount__hero-email {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-top: 2px;
+}
+.haaccount__hero-tag {
+  margin-top: 6px;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 9.5px;
+  letter-spacing: 0.20em;
+  text-transform: uppercase;
+  color: var(--baa-blue);
+}
+.haaccount__hero-tag em {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink);
+}
+.haaccount__hero-tag--unclaimed { color: var(--status-warn); }
+
+/* ---------- section overlines -------------------------------------- */
+.haaccount__section-overline {
+  display: block;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 0 0 12px;
+}
+
+/* ---------- form --------------------------------------------------- */
+.haaccount__form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.haaccount__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.haaccount__label {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+.haaccount__label-hint {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 11px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink-3);
+}
+.haaccount__input {
+  appearance: none;
+  background: var(--paper);
+  border: 0;
+  border-bottom: 1px solid var(--ink);
+  border-radius: 0;
+  padding: 8px 2px;
+  font-family: var(--font-serif);
+  font-size: 16px;
+  color: var(--ink);
+  outline: none;
+  transition: border-color var(--dur-quick) var(--ease-doc),
+              background var(--dur-quick) var(--ease-doc);
+}
+.haaccount__input:focus {
+  border-bottom-color: var(--baa-blue);
+  background: rgba(229, 235, 246, 0.45);
+}
+.haaccount__input.is-error {
+  border-bottom-color: var(--status-err);
+}
+
+.haaccount__error {
+  font-family: var(--font-serif);
+  font-style: italic;
+  color: var(--status-err);
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.haaccount__error::before {
+  content: '×';
+  font-family: var(--font-display);
+  font-size: 16px;
+  line-height: 1;
+}
+.haaccount__filed {
+  font-family: var(--font-serif);
+  font-style: italic;
+  color: var(--status-ok);
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.haaccount__filed::before {
+  content: '✓';
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.haaccount__submit {
+  appearance: none;
+  margin-top: 6px;
+  width: 100%;
+  background: var(--baa-blue);
+  color: var(--paper);
+  border: 0;
+  border-radius: 1px;
+  padding: 14px 16px;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background var(--dur-quick) var(--ease-doc),
+              transform var(--dur-quick) var(--ease-doc);
+}
+.haaccount__submit:hover { background: var(--baa-blue-ink); }
+.haaccount__submit:active { transform: translateY(1px); }
+.haaccount__submit:disabled {
+  background: var(--paper-2);
+  color: var(--ink-3);
+  cursor: not-allowed;
+}
+.haaccount__submit-arrow {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 14px;
+  letter-spacing: 0;
+}
+
+/* ---------- claim panel -------------------------------------------- */
+.haaccount__claim {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 4px;
+}
+.haaccount__claim-lede {
+  font-family: var(--font-serif);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink-2);
+  margin: 0;
+  text-wrap: pretty;
+}
+.haaccount__claim-suggest {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: var(--baa-blue-tint);
+  border-left: 2px solid var(--baa-blue);
+  gap: 12px;
+}
+.haaccount__claim-suggest-l {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 9.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--baa-blue);
+}
+.haaccount__claim-suggest-r {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 16px;
+  color: var(--ink);
+}
+
+/* search */
+.haaccount__search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--ink);
+}
+.haaccount__search-mark {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--ink-3);
+  padding: 0 6px 0 2px;
+}
+.haaccount__search-input {
+  flex: 1 1 auto;
+  appearance: none;
+  background: transparent;
+  border: 0;
+  outline: none;
+  padding: 8px 2px;
+  font-family: var(--font-serif);
+  font-size: 14px;
+  color: var(--ink);
+}
+.haaccount__search-clear {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  font-family: var(--font-display);
+  font-size: 18px;
+  color: var(--ink-3);
+  cursor: pointer;
+  padding: 0 2px;
+}
+
+.haaccount__roster {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 220px;
+  overflow-y: auto;
+  border-bottom: 0.5px solid var(--rule-soft);
+}
+.haaccount__roster li {
+  border-top: 0.5px solid var(--rule-soft);
+}
+.haaccount__roster li:first-child { border-top: 0; }
+.haaccount__roster-row {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 12px 6px;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 32px 1fr 22px;
+  gap: 10px;
+  align-items: baseline;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+  transition: background var(--dur-quick) var(--ease-doc);
+}
+.haaccount__roster-row:hover { background: var(--baa-blue-tint); }
+.haaccount__roster-row.is-active {
+  background: var(--baa-blue-tint);
+  color: var(--baa-blue);
+}
+.haaccount__roster-numeral {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--baa-blue);
+  text-align: center;
+}
+.haaccount__roster-name {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 16px;
+  letter-spacing: -0.005em;
+  color: var(--ink);
+}
+.haaccount__roster-row.is-active .haaccount__roster-name { color: var(--baa-blue); }
+.haaccount__roster-status {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-3);
+  text-align: right;
+}
+.haaccount__roster-row.is-active .haaccount__roster-status { color: var(--baa-blue); }
+.haaccount__roster-empty {
+  padding: 16px 8px;
+  font-family: var(--font-serif);
+  font-style: italic;
+  color: var(--ink-3);
+  text-align: center;
+}
+
+/* claimed (filed) state */
+.haaccount__claim-filed {
+  padding-top: 4px;
+}
+.haaccount__claim-row {
+  display: grid;
+  grid-template-columns: 28px 1fr auto;
+  align-items: baseline;
+  gap: 10px;
+  padding: 10px 0;
+  border-top: 0.5px solid var(--rule-soft);
+  border-bottom: 0.5px solid var(--rule-soft);
+}
+.haaccount__claim-numeral {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--baa-blue);
+  text-align: center;
+}
+.haaccount__claim-name {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 18px;
+  color: var(--ink);
+}
+.haaccount__claim-status {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 9.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--status-ok);
+}
+.haaccount__claim-note {
+  margin: 12px 0 0;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 12.5px;
+  color: var(--ink-3);
+  line-height: 1.5;
+}
+
+/* ---------- foot --------------------------------------------------- */
+.haaccount__foot {
+  margin-top: 28px;
+  padding-top: 12px;
+  border-top: 0.5px solid var(--rule-soft);
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 8.5px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+@media (max-width: 440px) {
+  .haaccount { width: 100vw; border-left: 0; }
+  .haaccount__head { padding: 16px 18px 10px; }
+  .haaccount__rule { margin: 0 18px; }
+  .haaccount__rule--soft { margin: 12px 18px; }
+  .haaccount__scroll { padding: 16px 18px 22px; }
+}

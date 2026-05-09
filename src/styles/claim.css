@@ -1,0 +1,567 @@
+/* ClaimScreen — post-signup profile designation flow.
+   BAA parody: certificate / official roster vibe. Inherits paper, ink,
+   Bodoni/EB Garamond/Archivo from tokens.css. */
+
+.haclaim {
+  width: 100%;
+  max-width: var(--app-col-max);
+  min-height: 100vh;
+  background: var(--paper);
+  color: var(--ink);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 1px 0 0 rgba(0,0,0,0.04), -1px 0 0 rgba(0,0,0,0.04);
+}
+
+/* ---------- masthead ------------------------------------------------- */
+.haclaim__masthead {
+  padding: 18px var(--app-pad-x) 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.haclaim__wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.haclaim__wordmark-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.haclaim__wordmark-text {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.haclaim__folio {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 9px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.haclaim__hairline {
+  border: 0;
+  border-top: 0.5px solid var(--rule-soft);
+  margin: 0 24px;
+}
+
+/* ---------- main column --------------------------------------------- */
+.haclaim__main {
+  padding: 28px var(--app-pad-x) 28px;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+}
+.haclaim__main--list {
+  padding-bottom: 120px; /* leave room for sticky bar */
+}
+.haclaim__main--center {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding-top: 64px;
+}
+
+.haclaim__overline {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 9.5px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--baa-blue);
+}
+.haclaim__title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 30px;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  margin: 8px 0 10px;
+  color: var(--ink);
+  text-wrap: pretty;
+}
+.haclaim__lede {
+  font-family: var(--font-serif);
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--ink-2);
+  margin: 0 0 22px;
+  text-wrap: pretty;
+  max-width: 36ch;
+}
+.haclaim__lede em {
+  font-style: italic;
+  color: var(--ink);
+}
+
+/* ---------- record card (match state) ------------------------------- */
+.haclaim__record {
+  margin: 4px 0 22px;
+  background: var(--paper);
+  border: 0.5px solid var(--rule-soft);
+  position: relative;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.04);
+}
+
+.haclaim__record-ribbon {
+  background: var(--baa-blue);
+  color: #fff;
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 9px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+}
+.haclaim__record-ribbon-dot {
+  width: 4px; height: 4px; border-radius: 50%;
+  background: var(--baa-yellow);
+  display: inline-block;
+}
+.haclaim__record-ribbon > span:last-child {
+  margin-left: auto;
+  color: var(--baa-yellow);
+}
+
+.haclaim__record-frame {
+  position: relative;
+  padding: 36px 22px 30px;
+  text-align: center;
+  /* nested faint frame line */
+  background:
+    linear-gradient(#fffdf2, #fffdf2) padding-box,
+    var(--paper);
+  border-top: 1px solid var(--baa-yellow);
+  border-bottom: 1px solid var(--baa-yellow);
+}
+.haclaim__record-frame::before {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border: 0.5px solid var(--baa-blue);
+  pointer-events: none;
+  opacity: 0.45;
+}
+
+.haclaim__record-corner {
+  position: absolute;
+  width: 14px; height: 14px;
+  border: 1.25px solid var(--baa-blue);
+  pointer-events: none;
+}
+.haclaim__record-corner--tl { top: 14px;    left: 14px;   border-right: 0; border-bottom: 0; }
+.haclaim__record-corner--tr { top: 14px;    right: 14px;  border-left: 0;  border-bottom: 0; }
+.haclaim__record-corner--bl { bottom: 14px; left: 14px;   border-right: 0; border-top: 0;    }
+.haclaim__record-corner--br { bottom: 14px; right: 14px;  border-left: 0;  border-top: 0;    }
+
+.haclaim__record-overline {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 13px;
+  color: var(--ink-2);
+  display: block;
+  margin-bottom: 10px;
+}
+.haclaim__record-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 30px;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  color: var(--baa-blue);
+  margin: 0 0 12px;
+  text-wrap: balance;
+  position: relative;
+  z-index: 1;
+}
+.haclaim__record-rule {
+  display: block;
+  width: 56px;
+  height: 1px;
+  background: var(--baa-blue);
+  margin: 0 auto 12px;
+  position: relative;
+  z-index: 1;
+}
+.haclaim__record-sub {
+  font-family: var(--font-serif);
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--ink-2);
+  display: block;
+  max-width: 30ch;
+  margin: 0 auto;
+  font-style: italic;
+  text-wrap: pretty;
+}
+.haclaim__record-seal {
+  margin: 18px auto 0;
+  display: block;
+  width: 64px;
+  height: 64px;
+  position: relative;
+  z-index: 1;
+}
+
+.haclaim__record-footnote {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 14px 10px;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 8.5px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+/* ---------- buttons ------------------------------------------------- */
+.haclaim__submit {
+  appearance: none;
+  width: 100%;
+  margin-top: 8px;
+  padding: 14px 16px;
+  background: var(--baa-blue);
+  color: #fff;
+  border: 1px solid var(--baa-blue-ink);
+  border-radius: 1px;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background var(--dur-quick) var(--ease-doc),
+              transform var(--dur-quick) var(--ease-doc);
+}
+.haclaim__submit:hover { background: var(--baa-blue-ink); }
+.haclaim__submit:active { transform: translateY(1px); }
+.haclaim__submit:disabled { opacity: 0.5; cursor: not-allowed; }
+.haclaim__submit-arrow {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: 16px;
+  letter-spacing: 0;
+}
+.haclaim__submit--compact {
+  flex: 0 0 auto;
+  width: auto;
+  margin-top: 0;
+  padding: 12px 14px;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  gap: 8px;
+}
+
+.haclaim__ghost {
+  appearance: none;
+  margin-top: 12px;
+  padding: 12px 14px;
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--rule-soft);
+  border-radius: 1px;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  cursor: pointer;
+  text-align: center;
+  transition: background var(--dur-quick) var(--ease-doc),
+              border-color var(--dur-quick) var(--ease-doc),
+              color var(--dur-quick) var(--ease-doc);
+}
+.haclaim__ghost:hover {
+  background: var(--baa-blue-tint);
+  border-color: var(--baa-blue);
+  color: var(--baa-blue-ink);
+}
+.haclaim__ghost:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.haclaim__back {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 0 0 14px;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  align-self: flex-start;
+}
+.haclaim__back:hover { color: var(--baa-blue); }
+.haclaim__back-arrow {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: 16px;
+}
+
+.haclaim__fineprint {
+  margin: 16px 0 0;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--ink-3);
+  text-wrap: pretty;
+}
+
+/* ---------- search -------------------------------------------------- */
+.haclaim__search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid var(--ink);
+  padding: 6px 0 7px;
+  margin-top: 4px;
+}
+.haclaim__search:focus-within {
+  border-bottom-color: var(--baa-blue);
+  border-bottom-width: 2px;
+  padding-bottom: 6px;
+}
+.haclaim__search-mark {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  color: var(--ink-3);
+  width: 18px;
+  text-align: center;
+}
+.haclaim__search-input {
+  appearance: none;
+  flex: 1 1 auto;
+  border: 0;
+  background: transparent;
+  outline: none;
+  font-family: var(--font-serif);
+  font-size: 15px;
+  color: var(--ink);
+}
+.haclaim__search-input::placeholder {
+  color: var(--ink-3);
+  font-style: italic;
+}
+.haclaim__search-clear {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  font-family: var(--font-mono);
+  font-size: 18px;
+  color: var(--ink-3);
+  cursor: pointer;
+  line-height: 1;
+  padding: 0 4px;
+}
+.haclaim__search-clear:hover { color: var(--ink); }
+
+/* ---------- roster -------------------------------------------------- */
+.haclaim__roster-meta {
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.haclaim__roster {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  border-top: 1px solid var(--ink);
+  border-bottom: 1px solid var(--ink);
+}
+.haclaim__roster > li {
+  border-bottom: 0.5px solid var(--rule-soft);
+}
+.haclaim__roster > li:last-child { border-bottom: 0; }
+
+.haclaim__roster-row {
+  appearance: none;
+  width: 100%;
+  background: transparent;
+  border: 0;
+  padding: 14px 4px 14px 0;
+  display: grid;
+  grid-template-columns: 38px 1fr 22px;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background var(--dur-quick) var(--ease-doc);
+}
+.haclaim__roster-row:hover { background: var(--baa-blue-tint); }
+.haclaim__roster-row.is-active {
+  background: #FFFDF2;
+  box-shadow: inset 3px 0 0 var(--baa-yellow);
+}
+.haclaim__roster-row.is-active .haclaim__roster-name { color: var(--baa-blue); }
+.haclaim__roster-row.is-active .haclaim__roster-status { color: var(--baa-blue); }
+
+.haclaim__roster-numeral {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--ink-3);
+  text-align: right;
+  padding-left: 8px;
+}
+.haclaim__roster-name {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 19px;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.haclaim__roster-status {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--ink-3);
+  text-align: center;
+}
+
+.haclaim__roster-empty {
+  padding: 18px 4px;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 13px;
+  color: var(--ink-3);
+  text-align: center;
+}
+
+/* ---------- sticky bottom bar (browse) ------------------------------ */
+.haclaim__sticky {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: var(--app-col-max);
+  background: var(--paper);
+  border-top: 1px solid var(--ink);
+  padding: 12px 24px calc(12px + env(safe-area-inset-bottom));
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: 0 -6px 16px rgba(26,26,26,0.05);
+}
+.haclaim__sticky-meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.haclaim__sticky-overline {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 8.5px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--baa-blue);
+}
+.haclaim__sticky-name {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 16px;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.haclaim__sticky-name--muted {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--ink-3);
+}
+
+/* ---------- confirmed interlude ------------------------------------ */
+.haclaim__confirmed {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 32ch;
+}
+.haclaim__confirmed-stamp {
+  display: inline-block;
+  animation: haclaim-stamp 600ms var(--ease-doc) both;
+  transform-origin: center;
+}
+@keyframes haclaim-stamp {
+  0%   { opacity: 0; transform: scale(1.4) rotate(-12deg); }
+  60%  { opacity: 1; transform: scale(0.96) rotate(-3deg); }
+  100% { opacity: 1; transform: scale(1) rotate(-3deg); }
+}
+.haclaim__confirmed-spinner {
+  margin-top: 22px;
+  width: 14px;
+  height: 14px;
+  border: 1.5px solid var(--rule-soft);
+  border-top-color: var(--baa-blue);
+  border-radius: 50%;
+  animation: haclaim-spin 0.9s linear infinite;
+}
+@keyframes haclaim-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ---------- colophon ----------------------------------------------- */
+.haclaim__colophon {
+  margin-top: auto;
+  padding: 20px var(--app-pad-x) 22px;
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 8.5px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  border-top: 0.5px solid var(--rule-soft);
+  margin-left: 24px;
+  margin-right: 24px;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* ---------- entrance ----------------------------------------------- */
+@keyframes haclaim-rise {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.haclaim__rise {
+  opacity: 0;
+  animation: haclaim-rise 0.5s var(--ease-doc) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .haclaim__rise { animation: none; opacity: 1; transform: none; }
+  .haclaim__confirmed-stamp { animation: none; }
+  .haclaim__confirmed-spinner { animation: none; }
+}

@@ -1,0 +1,367 @@
+/* certificate.css — the shareable artifact.
+   Square 400×400 face. Tightly tuned to render correctly through html2canvas
+   (no transforms on the captured root, all colors in sRGB, no gradients). */
+
+.certshare {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding: 28px 16px 40px;
+}
+
+/* ---------- the stage that holds the certificate -------------------- */
+.certshare__stage {
+  /* Light paper texture without raster — just very subtle banding via two flat layers. */
+  padding: 20px;
+  background: #F2F1EC;
+  border: 1px solid #E2DFD6;
+  display: inline-block;
+}
+
+/* =================================================================== */
+/*                    THE CERTIFICATE — 400 × 400                      */
+/* =================================================================== */
+.cert {
+  width: 400px;
+  min-height: 400px;
+  background: #FAFAF8;
+  position: relative;
+  font-family: var(--font-serif);
+  color: #1A1A1A;
+  overflow: hidden;
+}
+
+/* Double rule: outer thin line + inner thin line with paper between. */
+.cert__frame {
+  position: relative;
+  margin: 10px;
+  border: 1px solid #003DA5;
+}
+.cert__inner {
+  position: relative;
+  margin: 4px;
+  border: 0.5px solid #003DA5;
+  padding: 22px 26px 20px;
+  display: flex;
+  flex-direction: column;
+  min-height: 360px;
+}
+
+/* ---------- header ------------------------------------------------- */
+.cert__head {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.cert__crest {
+  display: inline-flex;
+  width: 28px;
+  height: 28px;
+  align-items: center;
+  justify-content: center;
+}
+.cert__org {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 10.5px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: #003DA5;
+  /* nudge for optical alignment with crest */
+  padding-top: 1px;
+}
+
+/* ---------- hairlines --------------------------------------------- */
+.cert__rule {
+  height: 0;
+  border-top: 0.75px solid #003DA5;
+  margin: 0 8px;
+}
+.cert__rule--foot {
+  margin-top: auto;
+}
+
+/* ---------- title block ------------------------------------------- */
+.cert__titleblock {
+  text-align: center;
+  margin-top: 14px;
+}
+.cert__title {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: #003DA5;
+}
+.cert__week {
+  margin-top: 6px;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: #555;
+}
+
+/* ---------- recipient (the loudest type) -------------------------- */
+.cert__name {
+  margin: 16px 0 0;
+  text-align: center;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 38px;
+  line-height: 1.02;
+  letter-spacing: -0.01em;
+  color: #1A1A1A;
+}
+.cert__name-line {
+  display: block;
+}
+.cert__name--co .cert__name-line {
+  font-size: 28px;
+  line-height: 1.1;
+}
+.cert__name--co .cert__name-line + .cert__name-line {
+  margin-top: 2px;
+}
+
+/* tiny yellow accent under the name */
+.cert__name-mark {
+  width: 36px;
+  height: 3px;
+  background: #FFDB00;
+  margin: 10px auto 0;
+}
+
+/* ---------- determination body ------------------------------------ */
+.cert__body {
+  margin: 14px 4px 0;
+  font-family: var(--font-serif);
+  font-size: 11.5px;
+  line-height: 1.55;
+  color: #1A1A1A;
+  text-align: center;
+  text-wrap: pretty;
+}
+
+/* ---------- foot --------------------------------------------------- */
+.cert__foot {
+  margin-top: 16px;
+  padding-top: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.cert__signer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.cert__signer-label {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 8.5px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: #555;
+}
+.cert__signer-name {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1A1A1A;
+}
+.cert__colophon {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 8px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: #8A8A85;
+}
+.cert__colophon-dot {
+  letter-spacing: 0;
+  color: #FFDB00;
+  font-size: 12px;
+  line-height: 0;
+  position: relative;
+  top: -1px;
+}
+
+/* =================================================================== */
+/*                            ACTIONS                                  */
+/* =================================================================== */
+.certshare__actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: min(440px, 100%);
+}
+
+.certshare__btn {
+  flex: 1 1 0;
+  min-width: 200px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 18px;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  border: 1px solid #003DA5;
+  border-radius: 1px;
+  cursor: pointer;
+  transition: background 120ms var(--ease-doc), color 120ms var(--ease-doc);
+}
+.certshare__btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.certshare__btn--primary {
+  background: #003DA5;
+  color: #FAFAF8;
+}
+.certshare__btn--primary:hover:not(:disabled) {
+  background: #002A73;
+}
+
+.certshare__btn--ghost {
+  background: transparent;
+  color: #003DA5;
+}
+.certshare__btn--ghost:hover {
+  background: #E5EBF6;
+}
+
+.certshare__btn-arrow {
+  font-family: var(--font-serif);
+  font-size: 14px;
+  letter-spacing: 0;
+  font-weight: 400;
+}
+
+.certshare__btn-loading {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+.certshare__dots {
+  display: inline-flex;
+  margin-left: 4px;
+}
+.certshare__dots span {
+  animation: certdot 1.2s infinite;
+  opacity: 0.2;
+}
+.certshare__dots span:nth-child(2) { animation-delay: 0.2s; }
+.certshare__dots span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes certdot {
+  0%, 60%, 100% { opacity: 0.2; }
+  30%           { opacity: 1; }
+}
+
+/* ---------- hint --------------------------------------------------- */
+.certshare__hint {
+  margin: 0;
+  max-width: 420px;
+  text-align: center;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #8A8A85;
+}
+
+/* =================================================================== */
+/* Showcase page chrome (only used by certificate.html demo page)      */
+/* =================================================================== */
+.certpage {
+  min-height: 100vh;
+  background: #FAFAF8;
+  padding: 40px 20px 80px;
+}
+.certpage__head {
+  max-width: 480px;
+  margin: 0 auto 24px;
+  text-align: center;
+}
+.certpage__overline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 9px;
+  background: #003DA5;
+  color: #fff;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+.certpage__overline-tick {
+  font-family: var(--font-display);
+  font-style: italic;
+  color: #FFDB00;
+  letter-spacing: 0;
+  font-size: 12px;
+  line-height: 0.9;
+}
+.certpage__title {
+  margin: 14px 0 0;
+  font-family: var(--font-sans);
+  font-weight: 800;
+  font-size: 22px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #003DA5;
+  line-height: 1;
+}
+.certpage__subtitle {
+  margin: 8px 0 0;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 13.5px;
+  color: #8A8A85;
+}
+
+.certpage__speech {
+  max-width: 480px;
+  margin: 32px auto 0;
+  padding: 18px 20px;
+  background: #F2F1EC;
+  border-left: 2px solid #003DA5;
+}
+.certpage__speech-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 9.5px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: #555;
+  margin-bottom: 10px;
+}
+.certpage__speech-body {
+  font-family: var(--font-serif);
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: #1A1A1A;
+  white-space: pre-wrap;
+  margin: 0;
+}

@@ -1,0 +1,284 @@
+/* =========================================================================
+   HYBRID ATHLETE OF THE WEEK — DESIGN TOKENS
+   The Committee. Established 1887 (in spirit). Rev. 2026.
+   ========================================================================= */
+
+/* ---------- Webfonts (Google Fonts substitutes; see README) -------------- */
+@import url("https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,600;0,6..96,700;0,6..96,800;1,6..96,400;1,6..96,500&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600;700&family=Archivo:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap");
+
+:root {
+  /* ---------------- Colors: BAA palette ------------------------------- */
+  --baa-blue:        #003DA5;   /* primary, official */
+  --baa-blue-ink:    #002A73;   /* hover/press, denser */
+  --baa-blue-tint:   #E5EBF6;   /* light wash, ribbons, headers */
+  --baa-yellow:      #FFDB00;   /* accent, ribbons, highlights */
+  --baa-yellow-ink:  #C9AE00;   /* hover/press for yellow */
+
+  --paper:           #FAFAF8;   /* the page */
+  --paper-2:         #F2F1EC;   /* card / aside */
+  --ink:             #1A1A1A;   /* text primary */
+  --ink-2:           #555555;   /* text secondary, metadata */
+  --ink-3:           #8A8A85;   /* tertiary, deep metadata */
+  --rule:            #1A1A1A;   /* hairline rules */
+  --rule-soft:       #C9C7BF;   /* light rules between rows */
+
+  /* Semantic */
+  --color-fg:        var(--ink);
+  --color-fg-2:      var(--ink-2);
+  --color-fg-3:      var(--ink-3);
+  --color-bg:        var(--paper);
+  --color-bg-2:      var(--paper-2);
+  --color-accent:    var(--baa-blue);
+  --color-accent-2:  var(--baa-yellow);
+  --color-rule:      var(--rule);
+  --color-rule-soft: var(--rule-soft);
+
+  /* Status (institutionally muted) */
+  --status-ok:       #1F6F3C;
+  --status-warn:     #8C5A00;
+  --status-err:      #8A1A1A;
+
+  /* ---------------- Type families ------------------------------------- */
+  --font-display:    "Bodoni Moda", "Didot", "Bodoni 72", "Bodoni MT", Georgia, serif;
+  --font-serif:      "EB Garamond", "Garamond", "Adobe Caslon", "Iowan Old Style", Georgia, serif;
+  --font-sans:       "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --font-mono:       "JetBrains Mono", "IBM Plex Mono", "SFMono-Regular", Menlo, monospace;
+
+  /* ---------------- Type scale (mobile baseline 16) ------------------- */
+  --fs-overline:     11px;
+  --fs-label:        12px;
+  --fs-meta:         13px;
+  --fs-body:         16px;
+  --fs-body-lg:      18px;
+  --fs-h6:           14px;
+  --fs-h5:           18px;
+  --fs-h4:           22px;
+  --fs-h3:           28px;
+  --fs-h2:           36px;
+  --fs-h1:           48px;
+  --fs-display:      64px;
+
+  --lh-tight:        1.05;
+  --lh-snug:         1.2;
+  --lh-normal:       1.45;
+  --lh-relaxed:      1.6;
+
+  /* Tracking — institutional small-caps feel */
+  --tk-tight:        -0.01em;
+  --tk-normal:       0;
+  --tk-wide:         0.08em;
+  --tk-wider:        0.16em;     /* labels */
+  --tk-widest:       0.24em;     /* overlines, chapter marks */
+
+  /* ---------------- Spacing — eighth-inch grid ------------------------ */
+  --sp-0:  0;
+  --sp-1:  2px;
+  --sp-2:  4px;
+  --sp-3:  8px;
+  --sp-4:  12px;
+  --sp-5:  16px;
+  --sp-6:  20px;
+  --sp-7:  24px;
+  --sp-8:  32px;
+  --sp-9:  40px;
+  --sp-10: 56px;
+  --sp-11: 72px;
+
+  /* ---------------- Borders ------------------------------------------- */
+  --bw-hair:   0.5px;
+  --bw-thin:   1px;
+  --bw-bold:   2px;
+  --bw-rule:   3px;       /* the heavy banner rule */
+  --radius-0:  0;         /* default — official documents do not round */
+  --radius-1:  2px;       /* subtle, for chips only */
+  --radius-2:  4px;       /* maximum tolerated curvature */
+
+  /* ---------------- Shadows (used sparingly) -------------------------- */
+  --shadow-paper: 0 1px 0 rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.06);
+  --shadow-card:  0 1px 2px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.06);
+  --shadow-stamp: 0 0 0 2px var(--baa-blue) inset;
+
+  /* ---------------- Motion -------------------------------------------- */
+  --ease-doc:   cubic-bezier(0.2, 0.0, 0.0, 1.0);
+  --dur-quick:  120ms;
+  --dur-base:   220ms;
+  --dur-slow:   420ms;
+
+  /* ---------------- Responsive document column ----------------------- */
+  /* The whole app is built as a single paper column centered on a stage.
+     Mobile-first: a phone-width strip. Larger viewports widen the column
+     a little so it doesn't read as a tiny island lost on a desktop. */
+  --app-col-max:  420px;
+  --app-pad-x:    24px;
+  --app-cert-scale: 0.84;   /* hahome certificate (native 400px) */
+}
+
+/* Small phones — keep tight */
+@media (max-width: 360px) {
+  :root {
+    --app-col-max: 100%;
+    --app-pad-x:   18px;
+  }
+}
+
+/* Tablet: the document grows and the gutters breathe. The certificate
+   relaxes to native 1:1; meta rows can run side-by-side. */
+@media (min-width: 720px) {
+  :root {
+    --app-col-max: 600px;
+    --app-pad-x:   40px;
+    --app-cert-scale: 1;
+  }
+}
+
+/* Desktop: a comfortable reading column. The page is a document; the
+   document does not need to fill the screen. The grey "stage" softens
+   so the column reads as the page itself, not a phone marooned on a
+   desktop. */
+@media (min-width: 1100px) {
+  :root {
+    --app-col-max: 720px;
+    --app-pad-x:   56px;
+    --app-cert-scale: 1;
+  }
+}
+
+/* =========================================================================
+   Base typography (semantic)
+   ========================================================================= */
+
+html, body {
+  background: var(--color-bg);
+  color: var(--color-fg);
+  font-family: var(--font-serif);
+  font-size: var(--fs-body);
+  line-height: var(--lh-normal);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, .h1 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--fs-h1);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--tk-tight);
+  margin: 0;
+}
+h2, .h2 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--fs-h2);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--tk-tight);
+  margin: 0;
+}
+h3, .h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--fs-h3);
+  line-height: var(--lh-snug);
+  margin: 0;
+}
+h4, .h4 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: var(--fs-h4);
+  line-height: var(--lh-snug);
+  margin: 0;
+}
+h5, .h5 {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: var(--fs-h5);
+  text-transform: uppercase;
+  letter-spacing: var(--tk-wider);
+  margin: 0;
+}
+h6, .h6 {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: var(--fs-h6);
+  text-transform: uppercase;
+  letter-spacing: var(--tk-wider);
+  margin: 0;
+}
+
+p, .p {
+  font-family: var(--font-serif);
+  font-size: var(--fs-body);
+  line-height: var(--lh-relaxed);
+  margin: 0 0 1em;
+  text-wrap: pretty;
+}
+
+.display {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: var(--fs-display);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+}
+
+.overline, .label {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: var(--fs-overline);
+  letter-spacing: var(--tk-widest);
+  text-transform: uppercase;
+  color: var(--color-fg);
+}
+
+.meta {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: var(--fs-meta);
+  letter-spacing: var(--tk-wide);
+  text-transform: uppercase;
+  color: var(--color-fg-2);
+}
+
+.cite {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: var(--fs-body);
+  line-height: var(--lh-relaxed);
+  color: var(--color-fg);
+}
+
+code, .mono, .num {
+  font-family: var(--font-mono);
+  font-size: 0.95em;
+  font-feature-settings: "tnum" 1, "lnum" 1;
+}
+
+hr, .rule {
+  border: 0;
+  border-top: var(--bw-thin) solid var(--color-rule);
+  margin: var(--sp-6) 0;
+}
+.rule-bold { border-top-width: var(--bw-bold); }
+.rule-banner { border-top-width: var(--bw-rule); }
+.rule-soft { border-top-color: var(--color-rule-soft); }
+
+/* Tracked uppercase running heads */
+.runhead {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: var(--tk-widest);
+  text-transform: uppercase;
+  color: var(--color-fg);
+}
+
+/* Drop cap, used on long citations */
+.dropcap::first-letter {
+  font-family: var(--font-display);
+  font-weight: 700;
+  float: left;
+  font-size: 3.2em;
+  line-height: 0.85;
+  padding: 4px 8px 0 0;
+}
+
+* { box-sizing: border-box; }

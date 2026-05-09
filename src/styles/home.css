@@ -1,0 +1,492 @@
+/* HomeScreen — institutional document, served as a web page. */
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: #E9E7E1;
+  color: var(--ink);
+  font-family: var(--font-serif);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* On desktop, drop the grey "stage" so the page reads as a single
+   continuous document instead of a phone strip floating in margins. */
+@media (min-width: 720px) {
+  html, body { background: var(--paper); }
+  .hahome { box-shadow: none; }
+}
+
+/* outer staging — a slip of off-grey paper the document sits on,
+   so the off-white page reads as a page. */
+body {
+  min-height: 100vh;
+}
+/* The React mount point is the actual flex item. Without an explicit
+   width it shrinks to fit its content, which means every screen inside
+   it resizes whenever its inner content changes width (e.g. the issue
+   screen growing as recipients are picked). Promote #root to the
+   centering flex layer so .hahome's `width: 100%; max-width: …` is
+   stable regardless of content. */
+#root {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.hahome {
+  width: 100%;
+  max-width: var(--app-col-max);
+  min-height: 100vh;
+  background: var(--paper);
+  color: var(--ink);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  /* faint vertical rules at the gutter — like a real form */
+  box-shadow: 1px 0 0 rgba(0,0,0,0.04), -1px 0 0 rgba(0,0,0,0.04);
+}
+
+/* ---------- masthead --------------------------------------------- */
+.hahome__masthead {
+  padding: 18px var(--app-pad-x) 8px;
+  /* Sticks to the top while the page scrolls — same persistence as the
+     hamburger button. The bottom border seals the masthead off from the
+     scrolling content beneath it. */
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: var(--paper);
+  border-bottom: 1px solid var(--ink);
+}
+
+.hahome__wordmark {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 22px;
+}
+.hahome__wordmark-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+.hahome__wordmark-text {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.hahome__wordmark-est {
+  margin-left: auto;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 12px;
+  color: var(--ink-3);
+  letter-spacing: 0;
+}
+
+.hahome__rule {
+  border: 0;
+  border-top: 1px solid var(--ink);
+  margin: 0;
+  width: 100%;
+}
+.hahome__rule--top {
+  margin-top: 8px;
+}
+.hahome__rule--soft {
+  border-top: 0.5px solid var(--rule-soft);
+  margin: 22px 0 0;
+}
+.hahome__rule--bottom {
+  border-top: 1px solid var(--ink);
+  margin-top: 18px;
+}
+
+.hahome__folio {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 6px 0 0;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 9.5px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+.hahome__folio > :first-child { text-align: left; }
+.hahome__folio > :last-child  { text-align: right; }
+.hahome__folio-c {
+  color: var(--ink);
+  text-align: center;
+}
+
+/* ---------- main: the record ------------------------------------- */
+.hahome__main {
+  padding: 22px var(--app-pad-x) 0;
+  flex: 1 1 auto;
+}
+
+.hahome__weekbadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 9px 5px 8px;
+  background: var(--baa-blue);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  border-radius: 1px;
+  text-decoration: none;
+}
+.hahome__weekbadge--link {
+  cursor: pointer;
+  transition: background var(--dur-quick) var(--ease-doc),
+              transform var(--dur-quick) var(--ease-doc);
+}
+.hahome__weekbadge--link:hover { background: var(--baa-blue-ink); }
+.hahome__weekbadge--link:active { transform: translateY(1px); }
+.hahome__weekbadge-arrow {
+  margin-left: 2px;
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: 13px;
+  letter-spacing: 0;
+  color: var(--baa-yellow);
+}
+.hahome__weekbadge-tick {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 13px;
+  letter-spacing: 0;
+  line-height: 0.9;
+  color: var(--baa-yellow);
+  margin-right: 2px;
+}
+.hahome__weekbadge-dot {
+  opacity: 0.6;
+  letter-spacing: 0;
+}
+
+.hahome__inre {
+  margin-top: 22px;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 10.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--baa-blue);
+}
+
+.hahome__name {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 44px;
+  line-height: 1.0;
+  letter-spacing: -0.025em;
+  margin: 6px 0 0;
+  color: var(--ink);
+  text-wrap: balance;
+}
+
+.hahome__byline {
+  margin-top: 10px;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.hahome__byline-dot {
+  opacity: 0.55;
+  letter-spacing: 0;
+}
+
+/* ---------- the certificate, framed under glass ------------------ */
+.hahome__cert {
+  margin: 24px 0 4px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+}
+.hahome__cert-overline {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 9px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  padding-bottom: 6px;
+  border-bottom: 0.5px solid var(--rule-soft);
+}
+.hahome__cert-overline-r {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--ink-3);
+}
+/* the "frame" — a thin gunmetal mat that surrounds the paper */
+.hahome__cert-stage {
+  margin-top: 10px;
+  padding: 10px;
+  background: #1A1A1A;
+  /* gilded corner hint without going gauche */
+  box-shadow:
+    inset 0 0 0 1px #2a2a2a,
+    inset 0 0 0 2px #1a1a1a,
+    0 1px 0 rgba(0,0,0,0.08),
+    0 8px 22px -12px rgba(0,0,0,0.45);
+  display: flex;
+  justify-content: center;
+  /* clip the shrunk certificate so its native 400×~440 doesn't overflow
+     the masthead's sticky boundary */
+  overflow: hidden;
+}
+/* The Certificate is fixed at 400px. Scale it to fit the column at
+   each breakpoint via --app-cert-scale (declared in tokens.css). */
+.hahome__cert-shrink {
+  width: 400px;
+  transform-origin: top center;
+  transform: scale(var(--app-cert-scale, 0.84));
+  /* native ≈ 432 (400 min + frame padding); claw back the height the
+     scale just removed so the next block isn't stranded above whitespace.
+     0.84 → ~70px; 1 → 0px. */
+  margin-bottom: calc((var(--app-cert-scale, 0.84) - 1) * 432px);
+}
+.hahome__cert-cap {
+  margin: 14px 0 0;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 12px;
+  line-height: 1.45;
+  text-align: center;
+  color: var(--ink-3);
+}
+
+/* ---------- citation --------------------------------------------- */
+.hahome__citation-head {
+  margin-top: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 9.5px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ink);
+  padding-bottom: 6px;
+  border-bottom: 0.5px solid var(--rule-soft);
+}
+.hahome__citation-folio {
+  color: var(--ink-3);
+}
+
+.hahome__cite {
+  font-family: var(--font-serif);
+  font-size: 15.5px;
+  line-height: 1.55;
+  color: var(--ink);
+  margin: 14px 0 0;
+  text-wrap: pretty;
+  letter-spacing: 0.005em;
+}
+.hahome__cite--lede::first-letter {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-style: normal;
+  float: left;
+  font-size: 3.4em;
+  line-height: 0.85;
+  padding: 4px 8px 0 0;
+  color: var(--ink);
+}
+
+/* ---------- attestation block ------------------------------------ */
+.hahome__attest {
+  margin-top: 22px;
+  padding-top: 12px;
+  border-top: 1px solid var(--ink);
+  display: grid;
+  gap: 6px;
+}
+.hahome__attest-rule { display: none; }
+.hahome__attest-row {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 12px;
+  font-family: var(--font-sans);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  align-items: baseline;
+}
+.hahome__attest-l {
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  font-size: 9.5px;
+}
+.hahome__attest-r {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 13px;
+  letter-spacing: 0;
+  color: var(--ink);
+  line-height: 1.45;
+}
+
+/* ---------- issuer action --------------------------------------- */
+.hahome__issue {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 18px;
+  padding: 14px 14px 14px 14px;
+  background: var(--baa-yellow);
+  color: var(--ink);
+  text-decoration: none;
+  border: 1px solid var(--ink);
+  border-radius: 1px;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  transition: transform var(--dur-quick) var(--ease-doc),
+              background var(--dur-base) var(--ease-doc);
+}
+.hahome__issue:hover {
+  background: #FFE74D;
+}
+.hahome__issue:active {
+  transform: translateY(1px);
+}
+.hahome__issue-arrow {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: 18px;
+  letter-spacing: 0;
+}
+
+/* ---------- nav -------------------------------------------------- */
+.hahome__nav {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  align-items: stretch;
+}
+.hahome__nav-item {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  border-left: 0.5px solid var(--rule-soft);
+  padding: 14px 8px 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 10.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--ink);
+  cursor: pointer;
+  transition: color var(--dur-quick) var(--ease-doc),
+              background var(--dur-quick) var(--ease-doc);
+}
+.hahome__nav-item:first-child {
+  border-left: 0;
+}
+.hahome__nav-item:hover {
+  background: var(--baa-blue-tint);
+  color: var(--baa-blue);
+}
+.hahome__nav-item.is-active {
+  color: var(--baa-blue);
+}
+.hahome__nav-item.is-active .hahome__nav-tick {
+  color: var(--baa-blue);
+}
+.hahome__nav-item.is-disabled {
+  color: var(--ink-3);
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+.hahome__nav-item.is-disabled:hover {
+  background: transparent;
+  color: var(--ink-3);
+}
+.hahome__nav-tick {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0;
+  color: var(--ink-3);
+  transform: translateY(-1px);
+}
+
+/* ---------- colophon -------------------------------------------- */
+.hahome__colophon {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px var(--app-pad-x) 22px;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 8.5px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+/* ---------- entrance: ink settling, not a sport ----------------- */
+@keyframes hahome-rise {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes hahome-draw {
+  from { opacity: 0; transform: scaleX(0); }
+  to   { opacity: 1; transform: scaleX(1); }
+}
+.hahome__rise {
+  opacity: 0;
+  animation: hahome-rise 0.6s var(--ease-doc) both;
+}
+.hahome__draw {
+  opacity: 0;
+  transform-origin: left center;
+  animation: hahome-draw 0.7s var(--ease-doc) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hahome__rise, .hahome__draw { animation: none; opacity: 1; transform: none; }
+}
+
+/* small accommodation — let the page breathe past the grid on tall screens */
+@media (min-height: 900px) {
+  .hahome { min-height: 100vh; }
+}
+
+/* Desktop: keep everything as a single centered reading column.
+   The page is a document; the document doesn't need to fill the screen. */
