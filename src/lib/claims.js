@@ -40,6 +40,47 @@ export async function listProfiles() {
   return data.map(r => r.display_name);
 }
 
+// Roster with the claimant's portrait attached when available. Used by the
+// Issue screen so the recipient grid shows real faces instead of initials.
+export async function listProfilesWithPhotos() {
+  if (!isLive()) {
+    const claims = loadLocal();
+    let users = [];
+    try { users = JSON.parse(localStorage.getItem('haotw.users') || '[]'); }
+    catch {}
+    const photoByEmail = new Map(
+      users.map(u => [(u.email || '').toLowerCase(), u.photo || null])
+    );
+    return HYBRID_PROFILES.map(name => {
+      const claim = claims[name];
+      const photoUrl = claim
+        ? photoByEmail.get((claim.email || '').toLowerCase()) || null
+        : null;
+      return { name, photoUrl };
+    });
+  }
+  const [{ data: profiles, error: pErr },
+         { data: claims,   error: cErr },
+         { data: rows,     error: rErr }] = await Promise.all([
+    supabase.from('hybrid_profiles').select('id, display_name').order('id'),
+    supabase.from('profile_claims').select('hybrid_profile_id, user_id'),
+    supabase.from('profiles').select('user_id, photo_url'),
+  ]);
+  if (pErr || cErr || rErr) {
+    console.warn('listProfilesWithPhotos failed, falling back to constant',
+      pErr || cErr || rErr);
+    return HYBRID_PROFILES.map(name => ({ name, photoUrl: null }));
+  }
+  const photoByUser = new Map((rows || []).map(r => [r.user_id, r.photo_url]));
+  const userByProfileId = new Map(
+    (claims || []).map(c => [c.hybrid_profile_id, c.user_id])
+  );
+  return (profiles || []).map(p => ({
+    name: p.display_name,
+    photoUrl: photoByUser.get(userByProfileId.get(p.id)) || null,
+  }));
+}
+
 export async function unclaimed() {
   if (!isLive()) {
     const c = loadLocal();

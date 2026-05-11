@@ -6,30 +6,18 @@
 
 import React from 'react';
 import { supabase, isLive } from '../lib/supabase.js';
-import { createDetermination } from '../lib/records.js';
+import { createDetermination, listDeterminations } from '../lib/records.js';
+import { listProfilesWithPhotos } from '../lib/claims.js';
 
 const ISSUE = {
-  week: 15,
-  determinationNo: 'CXLVIII',
   filedAt: 'Filed at Boston, Mass.',
   issuedBy: { id: 'tc', name: 'Theodore J. Clifford', short: 'T. J. Clifford' },
-  members: [
-    { id: 'ca',  name: 'Chris Ackerman',   initials: 'CA' },
-    { id: 'jb',  name: 'Jake Bernhardt',   initials: 'JB' },
-    { id: 'cs',  name: 'Caleb Shulman',    initials: 'CS' },
-    { id: 'wc',  name: 'Will Clifford',    initials: 'WC' },
-    { id: 'rd',  name: 'Ryan Dombroski',   initials: 'RD' },
-    { id: 'pf',  name: 'Paul Flanagan',    initials: 'PF' },
-    { id: 'll',  name: 'Logan Liljeberg',  initials: 'LL' },
-    { id: 'lt',  name: 'Long Tran',        initials: 'LT' },
-    { id: 'ec',  name: 'Ed Coleman',       initials: 'EC' },
-    { id: 'hm',  name: 'Hank McGreen',     initials: 'HM' },
-    { id: 'jbe', name: 'Josh Beasley',     initials: 'JB' },
-    { id: 'dl',  name: 'Dan Lignos',       initials: 'DL' },
-    { id: 'fn',  name: 'Franco Nieto',     initials: 'FN' },
-    { id: 'jh',  name: 'James Helf',       initials: 'JH' },
-  ],
 };
+
+const initialsFor = (name) =>
+  name.split(/\s+/).filter(Boolean).map(p => p[0]).join('').toUpperCase();
+const idFor = (name) =>
+  name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
 const MOCK_CERTIFICATE = (recipientShort) =>
   `${recipientShort} completed the 2026 London Marathon in a time of 2:58:41, six days ` +
@@ -66,14 +54,18 @@ const stripMarkdown = (text) =>
 
 const delay = (n) => ({ style: { animationDelay: `${n}ms` } });
 
-function Avatar({ initials, size = 64 }) {
+function Avatar({ initials, photoUrl, size = 64 }) {
   return (
     <span
-      className="haissue__avatar"
+      className={'haissue__avatar' + (photoUrl ? ' haissue__avatar--photo' : '')}
       style={{ width: size, height: size, fontSize: size * 0.32 }}
       aria-hidden="true"
     >
-      <span className="haissue__avatar-initials">{initials}</span>
+      {photoUrl ? (
+        <img className="haissue__avatar-img" src={photoUrl} alt="" />
+      ) : (
+        <span className="haissue__avatar-initials">{initials}</span>
+      )}
     </span>
   );
 }
@@ -92,8 +84,6 @@ function CertificatePreview({ recipients, body, week, determinationNo, issuer })
       <div className="haissue__certpaper-title">Determination of the Committee</div>
       <div className="haissue__certpaper-folio">
         <span>No. {determinationNo}</span>
-        <span>·</span>
-        <span>Week {week}</span>
         <span>·</span>
         <span>May 8</span>
       </div>
@@ -132,7 +122,7 @@ function CertificatePreview({ recipients, body, week, determinationNo, issuer })
   );
 }
 
-function ConfirmModal({ open, recipients, onConfirm, onCancel }) {
+function ConfirmModal({ open, recipients, awardNo, onConfirm, onCancel }) {
   if (!open) return null;
   const names = recipients.map(r => r.name);
   return (
@@ -142,7 +132,7 @@ function ConfirmModal({ open, recipients, onConfirm, onCancel }) {
         <div className="haissue__modal-title">This determination is permanent.</div>
         <p className="haissue__modal-body">
           <strong>{joinNames(names)}</strong> will be entered into the official record
-          for Week {ISSUE.week}. Once filed, the Citation cannot be amended.
+          as Determination No. {awardNo ?? '—'}. Once filed, the Citation cannot be amended.
         </p>
         <p className="haissue__modal-body haissue__modal-body--quiet">
           Proceed?
@@ -167,13 +157,35 @@ function IssueScreen({ issuer }) {
   const [generated, setGenerated] = React.useState('');
   const [confirmOpen, setConfirmOpen] = React.useState(false);
   const [filed, setFiled] = React.useState(false);
+  const [members, setMembers] = React.useState([]);
+  const [awardNo, setAwardNo] = React.useState(null);
+  const [nextWeek, setNextWeek] = React.useState(null);
+
+  React.useEffect(() => {
+    let cancelled = false;
+    listProfilesWithPhotos().then(rows => {
+      if (cancelled) return;
+      setMembers(rows.map(({ name, photoUrl }) => ({
+        id: idFor(name),
+        name,
+        initials: initialsFor(name),
+        photoUrl,
+      })));
+    });
+    listDeterminations().then(records => {
+      if (cancelled) return;
+      setAwardNo(records.length + 1);
+      setNextWeek(records.length ? records[0].week + 1 : 1);
+    });
+    return () => { cancelled = true; };
+  }, []);
 
   const issuedBy = issuer && issuer.name
     ? { ...ISSUE.issuedBy, name: issuer.name, short: shortName(issuer.name) }
     : ISSUE.issuedBy;
 
   const selectedMembers = selected.map(
-    id => ISSUE.members.find(m => m.id === id)
+    id => members.find(m => m.id === id)
   ).filter(Boolean);
 
   const toggleMember = (m) => {
@@ -234,10 +246,11 @@ function IssueScreen({ issuer }) {
   };
 
   const fileDetermination = async () => {
+    if (nextWeek == null) return;
     setConfirmOpen(false);
     const winners = selectedMembers.map(m => m.name);
     await createDetermination({
-      week: ISSUE.week,
+      week: nextWeek,
       winners,
       determiner: issuer.hybridProfile,
       determinedOn: new Date().toLocaleDateString('en-US', {
@@ -251,7 +264,7 @@ function IssueScreen({ issuer }) {
   };
 
   const canGenerate = selectedMembers.length > 0 && speech.trim().length > 0 && genState !== 'loading' && !filed;
-  const canSubmit = selectedMembers.length > 0 && speech.trim().length > 0 && genState === 'ready' && !filed;
+  const canSubmit = selectedMembers.length > 0 && speech.trim().length > 0 && genState === 'ready' && !filed && nextWeek != null;
 
   return (
     <div className="hahome haissue">
@@ -277,8 +290,8 @@ function IssueScreen({ issuer }) {
             <span className="haissue__back-arrow" aria-hidden="true">←</span>
             Return
           </a>
-          <span className="hahome__folio-c">Determination · Folio II</span>
-          <span>Wk {ISSUE.week}</span>
+          <span className="hahome__folio-c">Determination</span>
+          <span>{new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
         </div>
       </header>
 
@@ -287,7 +300,7 @@ function IssueScreen({ issuer }) {
           <div className="haissue__overline">
             <span className="haissue__overline-tick" aria-hidden="true">§</span>
             <span>Issue Determination</span>
-            <span className="haissue__overline-no">No. {ISSUE.determinationNo}</span>
+            <span className="haissue__overline-no">No. {awardNo ?? '—'}</span>
           </div>
           <h1 className="haissue__title">Issue Determination</h1>
           <p className="haissue__subtitle">The Committee awaits your findings.</p>
@@ -309,9 +322,9 @@ function IssueScreen({ issuer }) {
           </div>
 
           <div className="haissue__grid">
-            {ISSUE.members.map((m) => {
+            {members.map((m) => {
               const isSelected = selected.includes(m.id);
-              const isYou = m.isYou;
+              const isYou = !!issuer && issuer.hybridProfile === m.name;
               return (
                 <button
                   key={m.id}
@@ -321,12 +334,12 @@ function IssueScreen({ issuer }) {
                     (isSelected ? ' is-selected' : '') +
                     (isYou ? ' is-you' : '')
                   }
-                  onClick={() => toggleMember(m)}
+                  onClick={() => toggleMember({ ...m, isYou })}
                   aria-pressed={isSelected}
                   disabled={isYou}
                 >
                   <span className="haissue__card-avatar-wrap">
-                    <Avatar initials={m.initials} />
+                    <Avatar initials={m.initials} photoUrl={m.photoUrl} />
                     {isSelected && (
                       <span className="haissue__card-check" aria-hidden="true">
                         <svg viewBox="0 0 16 16" width="14" height="14">
@@ -337,11 +350,7 @@ function IssueScreen({ issuer }) {
                       </span>
                     )}
                   </span>
-                  <span className="haissue__card-name">
-                    {m.name.split(' ').slice(0, -1).map(p => p[0] + '.').join(' ')}
-                    <br />
-                    {m.name.split(' ').slice(-1)[0]}
-                  </span>
+                  <span className="haissue__card-name">{m.name}</span>
                   {isYou && <span className="haissue__card-you">(you)</span>}
                 </button>
               );
@@ -449,8 +458,8 @@ function IssueScreen({ issuer }) {
           <CertificatePreview
             recipients={selectedMembers}
             body={generated}
-            week={ISSUE.week}
-            determinationNo={ISSUE.determinationNo}
+            week={nextWeek ?? '—'}
+            determinationNo={awardNo ?? '—'}
             issuer={issuedBy}
           />
           <p className="haissue__preview-caption">
@@ -488,7 +497,7 @@ function IssueScreen({ issuer }) {
 
         <div className="haissue__colophon">
           <span>The Committee</span>
-          <span>Determination No. {ISSUE.determinationNo}</span>
+          <span>Determination No. {awardNo ?? '—'}</span>
           <span>May 8</span>
         </div>
       </main>
@@ -496,6 +505,7 @@ function IssueScreen({ issuer }) {
       <ConfirmModal
         open={confirmOpen && !filed}
         recipients={selectedMembers}
+        awardNo={awardNo}
         onCancel={() => setConfirmOpen(false)}
         onConfirm={fileDetermination}
       />

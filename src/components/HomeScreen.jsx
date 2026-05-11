@@ -96,10 +96,6 @@ function HomeScreen({ isChampion = false, determination }) {
 
         <div className="hahome__attest hahome__rise" {...delay(1440)}>
           <div className="hahome__attest-row">
-            <span className="hahome__attest-l">Witnessed</span>
-            <span className="hahome__attest-r">D. Okafor &middot; in person</span>
-          </div>
-          <div className="hahome__attest-row">
             <span className="hahome__attest-l">Filed</span>
             <span className="hahome__attest-r">Filed at Boston, Mass. &middot; 18:42 EDT</span>
           </div>

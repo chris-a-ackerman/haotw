@@ -151,6 +151,7 @@ function SignInPanel({ onAuthed, onWantSignUp }) {
 function PasscodePanel({ onPass, onBack }) {
   const [code, setCode] = React.useState('');
   const [error, setError] = React.useState(false);
+  const [focused, setFocused] = React.useState(false);
   const inputRef = React.useRef(null);
   const cells = 5;
 
@@ -210,7 +211,8 @@ function PasscodePanel({ onPass, onBack }) {
               className={
                 'haauth__cipher-cell' +
                 (ch ? ' is-filled' : '') +
-                (error ? ' is-error' : '')
+                (error ? ' is-error' : '') +
+                (focused && !error && i === code.length ? ' is-active' : '')
               }
             >
               {ch || ''}
@@ -228,6 +230,8 @@ function PasscodePanel({ onPass, onBack }) {
           maxLength={cells}
           value={code}
           onChange={(e) => onChange(e.target.value)}
+          onFocus={() => setFocused(true)}
+          onBlur={() => setFocused(false)}
           aria-label="Invitation passcode"
           style={{
             position: 'absolute',

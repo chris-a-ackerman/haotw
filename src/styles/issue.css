@@ -200,6 +200,18 @@
   position: relative;
   top: 1px;
 }
+.haissue__avatar--photo {
+  background: var(--paper-2);
+  padding: 0;
+  overflow: hidden;
+}
+.haissue__avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+}
 
 .haissue__card-check {
   position: absolute;
