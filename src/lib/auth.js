@@ -54,12 +54,24 @@ function sessionFromUser(user, profile) {
 
 async function fetchProfile(userId) {
   if (!isLive() || !userId) return null;
-  const { data, error } = await supabase
+  // Race the query against a short timeout as defensive cover for a flaky
+  // network. Falling back to null routes the user to ClaimScreen, which is
+  // recoverable; hanging the auth gate is not.
+  const query = supabase
     .from('profiles')
     .select('name, photo_url, hybrid_profile')
     .eq('user_id', userId)
     .maybeSingle();
-  if (error && error.code !== 'PGRST116') {
+  let timer;
+  const timeout = new Promise((resolve) => {
+    timer = setTimeout(() => {
+      console.warn('profile fetch timed out after 2000ms');
+      resolve({ data: null, error: { code: 'TIMEOUT' } });
+    }, 2000);
+  });
+  const { data, error } = await Promise.race([query, timeout]);
+  clearTimeout(timer);
+  if (error && error.code !== 'PGRST116' && error.code !== 'TIMEOUT') {
     // PGRST116 = no rows; that's fine for new users.
     console.warn('profile fetch failed', error);
   }
@@ -246,10 +258,15 @@ export async function updatePhoto({ email, photo }) {
 
 export function onAuthStateChange(callback) {
   if (!isLive()) return { unsubscribe: () => {} };
-  const { data } = supabase.auth.onAuthStateChange(async (_event, session) => {
+  const { data } = supabase.auth.onAuthStateChange((_event, session) => {
     if (!session) { callback(null); return; }
-    const profile = await fetchProfile(session.user.id);
-    callback(sessionFromUser(session.user, profile));
+    // Defer the profile fetch out of the callback — supabase-js holds an
+    // internal auth lock while running onAuthStateChange callbacks, and any
+    // Supabase query awaited from inside the callback deadlocks on that lock.
+    setTimeout(async () => {
+      const profile = await fetchProfile(session.user.id);
+      callback(sessionFromUser(session.user, profile));
+    }, 0);
   });
   return { unsubscribe: () => data.subscription.unsubscribe() };
 }

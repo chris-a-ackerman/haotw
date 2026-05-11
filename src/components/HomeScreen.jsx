@@ -5,38 +5,30 @@
 import React from 'react';
 import { Certificate } from './Certificate.jsx';
 
-const data = {
-  week: 14,
-  champion: { name: 'Theodore J. Clifford', town: 'Brookline, Mass.' },
-  crownedBy: 'Marcus A. Devlin',
-  crownedOn: 'April 28, 2026',
-  issuedAt: '18:42 EDT',
-  filedAt: 'Filed at Boston, Mass.',
-  citation: [
-    'After a dominant performance and 6-minute PR at Boston, Mr. Clifford took his exceptionally good looks and Adidas Adios Pros to London, where he dropped a casual sub-3 marathon 6 days after Boston while making a quick pit stop at the loo.',
-    'Arguably this is even more impressive than his day in Boston. The Committee, having reviewed corroborating chat logs and one (1) screenshot of a finish-line photo, finds the effort sufficient to merit recognition under the Hybrid standard, and so confers this Determination.',
-  ],
-  viewerIsHolder: true,
-};
-
 const delay = (n) => ({ style: { animationDelay: `${n}ms` } });
 
-const HOME_CERT = {
-  org:        'Hybrid Athletes',
-  title:      'Hybrid Athlete of the Week',
-  weekLabel:  'Week 14 · April 28, 2026',
-  recipients: ['Mr. T. J. Clifford'],
-  body:
-    'Mr. Clifford completed the 2026 London Marathon in 2:58:41, six days ' +
-    'following a 6-minute personal record at the 130th Boston Athletic ' +
-    'Federation Marathon. A gastrointestinal episode was noted and ' +
-    'resolved mid-race. The determination stands.',
-  determinedBy: 'Marcus A. Devlin',
-  est:         'Est. 2023',
-};
+function HomeScreen({ isChampion = false, determination }) {
+  if (!determination) {
+    return (
+      <div className="hahome">
+        <main className="hahome__main">
+          <div className="hahome__inre">Awaiting first Determination</div>
+        </main>
+      </div>
+    );
+  }
 
-function HomeScreen({ isChampion = data.viewerIsHolder }) {
-  const viewerIsHolder = isChampion;
+  const cert = {
+    org:        'Hybrid Athletes',
+    title:      determination.winners.length > 1 ? 'Hybrid Athletes of the Week' : 'Hybrid Athlete of the Week',
+    weekLabel:  `Week ${determination.week} · ${determination.determinedOn}`,
+    recipients: determination.winners,
+    body:       determination.citation,
+    determinedBy: determination.determiner,
+    est:        'Est. 2023',
+  };
+
+  const determinerFirst = (determination.determiner || '').split(' ')[0];
 
   return (
     <div className="hahome">
@@ -67,7 +59,7 @@ function HomeScreen({ isChampion = data.viewerIsHolder }) {
       <main className="hahome__main">
         <a href="record.html" className="hahome__weekbadge hahome__weekbadge--link hahome__rise" {...delay(440)}>
           <span className="hahome__weekbadge-tick" aria-hidden="true">§</span>
-          <span>Week 14</span>
+          <span>Week {determination.week}</span>
           <span className="hahome__weekbadge-dot" aria-hidden="true">·</span>
           <span>Official Record</span>
           <span className="hahome__weekbadge-arrow" aria-hidden="true">→</span>
@@ -76,13 +68,13 @@ function HomeScreen({ isChampion = data.viewerIsHolder }) {
         <div className="hahome__inre hahome__rise" {...delay(580)}>Current HAOTW</div>
 
         <h1 className="hahome__name hahome__rise" {...delay(640)}>
-          {data.champion.name}
+          {determination.winners.join(' · ')}
         </h1>
 
         <div className="hahome__byline hahome__rise" {...delay(860)}>
-          <span>Crowned by {data.crownedBy.split(' ')[0]}</span>
+          <span>Crowned by {determinerFirst}</span>
           <span className="hahome__byline-dot" aria-hidden="true">·</span>
-          <span>{data.crownedOn}</span>
+          <span>{determination.determinedOn}</span>
         </div>
 
         <figure className="hahome__cert hahome__rise" {...delay(940)}>
@@ -92,7 +84,7 @@ function HomeScreen({ isChampion = data.viewerIsHolder }) {
           </div>
           <div className="hahome__cert-stage" aria-label="Certificate of Determination, framed">
             <div className="hahome__cert-shrink">
-              <Certificate data={HOME_CERT} />
+              <Certificate data={cert} />
             </div>
           </div>
           <figcaption className="hahome__cert-cap">
@@ -109,7 +101,7 @@ function HomeScreen({ isChampion = data.viewerIsHolder }) {
           </div>
           <div className="hahome__attest-row">
             <span className="hahome__attest-l">Filed</span>
-            <span className="hahome__attest-r">{data.filedAt} &middot; {data.issuedAt}</span>
+            <span className="hahome__attest-r">Filed at Boston, Mass. &middot; 18:42 EDT</span>
           </div>
           <div className="hahome__attest-row">
             <span className="hahome__attest-l">Determination</span>
@@ -117,7 +109,7 @@ function HomeScreen({ isChampion = data.viewerIsHolder }) {
           </div>
         </div>
 
-        {viewerIsHolder && (
+        {isChampion && (
           <a href="issue.html" className="hahome__issue hahome__rise" {...delay(1620)}>
             <span className="hahome__issue-label">Choose the next HAOTW</span>
             <span className="hahome__issue-arrow" aria-hidden="true">→</span>

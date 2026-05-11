@@ -5,6 +5,7 @@
 
 import React from 'react';
 import * as Auth from './lib/auth.js';
+import { listDeterminations } from './lib/records.js';
 import HomeScreen from './components/HomeScreen.jsx';
 import RecordScreen from './components/RecordScreen.jsx';
 import StatsScreen from './components/StatsScreen.jsx';
@@ -191,17 +192,32 @@ function App() {
   const [authReady, setAuthReady] = React.useState(false);
   const [session, setSession] = React.useState(null);
   const [certPayload, setCertPayload] = React.useState(null);
+  const [determinations, setDeterminations] = React.useState([]);
+
+  const refreshDeterminations = React.useCallback(async () => {
+    try {
+      setDeterminations(await listDeterminations());
+    } catch (err) {
+      console.warn('listDeterminations() failed:', err);
+    }
+  }, []);
 
   // Initial session load + auth state subscription. Subscription matters for
   // OAuth: Google sign-in redirects away and back, and Supabase fires the
   // SIGNED_IN event on return.
   React.useEffect(() => {
     let cancelled = false;
-    Auth.loadSession().then((s) => {
-      if (cancelled) return;
-      setSession(s);
-      setAuthReady(true);
-    });
+    Auth.loadSession()
+      .then((s) => {
+        if (cancelled) return;
+        setSession(s);
+        setAuthReady(true);
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        console.error('Auth.loadSession() failed:', err);
+        setAuthReady(true);
+      });
     const sub = Auth.onAuthStateChange((s) => {
       if (cancelled) return;
       setSession(s);
@@ -226,11 +242,25 @@ function App() {
     setSession(null);
   }, []);
 
-  // TODO: derive from latest determination row — when the active user's
-  // claimed hybrid_profile matches the most recent determinations.winners[],
-  // they're the reigning champion. For now the prototype pretends every
-  // viewer is the champion so the issue-determination flow is reachable.
-  const isChampion = !!session;
+  // Load the official record once the user is signed in, and again whenever
+  // they land on the home view — that's how a freshly filed determination
+  // propagates back to the masthead without a manual reload.
+  React.useEffect(() => {
+    if (!session) return;
+    refreshDeterminations();
+  }, [session, refreshDeterminations]);
+  React.useEffect(() => {
+    if (view !== 'home' || !session) return;
+    refreshDeterminations();
+  }, [view, session, refreshDeterminations]);
+
+  const latestDetermination = determinations[0] || null;
+  const isChampion = !!(
+    session &&
+    session.hybridProfile &&
+    latestDetermination &&
+    latestDetermination.winners.includes(session.hybridProfile)
+  );
 
   const navigate = React.useCallback((next) => {
     setView(next);
@@ -268,7 +298,7 @@ function App() {
 
   // Render
   let screen = null;
-  if (view === 'home')         screen = <HomeScreen isChampion={isChampion} />;
+  if (view === 'home')         screen = <HomeScreen isChampion={isChampion} determination={latestDetermination} />;
   else if (view === 'archive') screen = (
     <RecordScreen
       onViewCertificate={(entry) => {

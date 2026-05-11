@@ -239,7 +239,7 @@ function IssueScreen({ issuer }) {
     await createDetermination({
       week: ISSUE.week,
       winners,
-      determiner: issuedBy.name.split(' ')[0],
+      determiner: issuer.hybridProfile,
       determinedOn: new Date().toLocaleDateString('en-US', {
         month: 'long', day: 'numeric', year: 'numeric',
       }),
