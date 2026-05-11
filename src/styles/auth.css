@@ -374,6 +374,35 @@
 }
 .haauth__swap-link:hover { color: var(--baa-blue-ink); }
 
+/* Inline label link (e.g. "Forgot passphrase?" beside the Passphrase label).
+   Sits on the label baseline; tighter than the bottom-row swap link. */
+.haauth__label-link {
+  font-size: 9.5px;
+  letter-spacing: 0.22em;
+  border-bottom-width: 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  color: var(--baa-blue);
+}
+.haauth__label-link:hover { color: var(--baa-blue-ink); }
+
+/* "Instructions dispatched" confirmation block in the Recover panel. */
+.haauth__notice {
+  margin-top: 18px;
+  padding: 14px 16px;
+  border: 0.5px solid var(--rule-soft);
+  background: var(--paper-2);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-family: var(--font-serif);
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--ink);
+}
+.haauth__notice .haauth__overline { color: var(--baa-blue); }
+.haauth__notice p { margin: 0; }
+
 /* ---------- back link (passcode → sign in, sign up → passcode) ------- */
 .haauth__back {
   appearance: none;

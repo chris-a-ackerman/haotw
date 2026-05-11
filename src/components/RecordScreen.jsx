@@ -45,7 +45,7 @@ function Entry({ entry, expanded, onToggle, onViewCertificate, riseDelay }) {
     >
       <div className="harec__entry-head">
         <span className={'harec__week' + (entry.current ? ' is-current' : '')}>
-          {entry.current ? 'Current Determination' : `Week ${String(entry.week).padStart(2, '0')}`}
+          {entry.current ? 'Current Determination' : `No. ${entry.determinationNumber}`}
         </span>
         {entry.coDetermination && (
           <span className="harec__co">Co-Determination</span>
@@ -109,7 +109,7 @@ function Entry({ entry, expanded, onToggle, onViewCertificate, riseDelay }) {
 }
 
 function RecordScreen({ onViewCertificate }) {
-  const [openWeek, setOpenWeek] = React.useState(null);
+  const [openNumber, setOpenNumber] = React.useState(null);
   const [records, setRecords] = React.useState([]);
 
   React.useEffect(() => {
@@ -155,11 +155,11 @@ function RecordScreen({ onViewCertificate }) {
       <ol className="harec__list">
         {records.map((r, i) => (
           <Entry
-            key={r.week}
+            key={r.determinationNumber}
             entry={r}
-            expanded={openWeek === r.week}
+            expanded={openNumber === r.determinationNumber}
             onToggle={() =>
-              setOpenWeek((cur) => (cur === r.week ? null : r.week))
+              setOpenNumber((cur) => (cur === r.determinationNumber ? null : r.determinationNumber))
             }
             onViewCertificate={onViewCertificate}
             riseDelay={720 + i * 80}

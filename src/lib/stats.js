@@ -95,8 +95,8 @@ function rankMembers(members) {
 }
 
 function computeLongestStreak(profiles, determinations) {
-  // Walk weeks ascending so consecutive runs accumulate naturally.
-  const ascending = determinations.slice().sort((a, b) => a.week - b.week);
+  // Walk determinations ascending so consecutive runs accumulate naturally.
+  const ascending = determinations.slice().sort((a, b) => a.determinationNumber - b.determinationNumber);
   if (ascending.length === 0) return null;
 
   let best = null; // { who, weeks, startValue, endValue }

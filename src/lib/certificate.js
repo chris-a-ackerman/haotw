@@ -16,9 +16,9 @@ export async function capturePng(node) {
   return new Promise((r) => canvas.toBlob(r, 'image/png'));
 }
 
-export async function uploadCertificate(blob, { week, recipientSlug }) {
+export async function uploadCertificate(blob, { determinationNumber, recipientSlug }) {
   if (!isLive() || !blob) return null;
-  const filename = `w${String(week).padStart(2, '0')}-${recipientSlug || 'cert'}-${Date.now()}.png`;
+  const filename = `d${String(determinationNumber).padStart(2, '0')}-${recipientSlug || 'cert'}-${Date.now()}.png`;
   const path = `${filename}`;
   const { error } = await supabase
     .storage

@@ -50,7 +50,7 @@ function GoogleMark() {
   );
 }
 
-function SignInPanel({ onAuthed, onWantSignUp }) {
+function SignInPanel({ onAuthed, onWantSignUp, onWantRecover }) {
   const [email, setEmail]       = React.useState('');
   const [password, setPassword] = React.useState('');
   const [error, setError]       = React.useState(null);
@@ -115,6 +115,13 @@ function SignInPanel({ onAuthed, onWantSignUp }) {
         <div className="haauth__field">
           <label className="haauth__label" htmlFor="auth-password">
             <span>Passphrase</span>
+            <button
+              type="button"
+              className="haauth__swap-link haauth__label-link"
+              onClick={() => onWantRecover(email)}
+            >
+              Forgot passphrase?
+            </button>
           </label>
           <input
             id="auth-password"
@@ -413,14 +420,164 @@ function SignUpPanel({ onAuthed, onBack }) {
   );
 }
 
+function RecoverPanel({ initialEmail, onSentToReset, onBack }) {
+  const [email, setEmail] = React.useState(initialEmail || '');
+  const [error, setError] = React.useState(null);
+  const [busy, setBusy]   = React.useState(false);
+  const [sent, setSent]   = React.useState(false);
+
+  const submit = async (e) => {
+    e.preventDefault();
+    if (!email) { setError('An email of record is required.'); return; }
+    setBusy(true);
+    const r = await Auth.requestPasswordReset({ email: email.trim() });
+    setBusy(false);
+    if (!r.ok) { setError(r.error); return; }
+    if (r.devReset) { onSentToReset(email.trim()); return; }
+    setSent(true);
+  };
+
+  return (
+    <main className="haauth__main">
+      <button type="button" className="haauth__back" onClick={onBack}>
+        <span className="haauth__back-arrow" aria-hidden="true">←</span>
+        <span>Return to sign in</span>
+      </button>
+
+      <span className="haauth__overline haauth__rise">Restoration of Access</span>
+      <h1 className="haauth__title haauth__rise" style={{ animationDelay: '60ms' }}>
+        Mislaid your passphrase?
+      </h1>
+      <p className="haauth__lede haauth__rise" style={{ animationDelay: '140ms' }}>
+        Submit the email on file. The Committee will dispatch instructions for
+        restoring access.
+      </p>
+
+      {sent ? (
+        <div className="haauth__notice haauth__rise" style={{ animationDelay: '220ms' }}>
+          <span className="haauth__overline">Filed</span>
+          <p>If that email is on file, instructions have been dispatched to it.</p>
+        </div>
+      ) : (
+        <form className="haauth__form haauth__rise" onSubmit={submit}
+              style={{ animationDelay: '220ms' }} noValidate>
+          <div className="haauth__field">
+            <label className="haauth__label" htmlFor="rec-email">
+              <span>Email of Record</span>
+            </label>
+            <input
+              id="rec-email"
+              type="email"
+              autoComplete="email"
+              className={'haauth__input' + (error ? ' is-error' : '')}
+              value={email}
+              onChange={(e) => { setEmail(e.target.value); setError(null); }}
+              placeholder="member@example.com"
+            />
+            {error && <span className="haauth__error">{error}</span>}
+          </div>
+          <button type="submit" className="haauth__submit" disabled={busy}>
+            <span>{busy ? 'Dispatching…' : 'Dispatch Instructions'}</span>
+            <span className="haauth__submit-arrow" aria-hidden="true">→</span>
+          </button>
+        </form>
+      )}
+    </main>
+  );
+}
+
+function ResetPanel({ email, onAuthed, onBack }) {
+  const [pass, setPass]       = React.useState('');
+  const [confirm, setConfirm] = React.useState('');
+  const [error, setError]     = React.useState(null);
+  const [busy, setBusy]       = React.useState(false);
+
+  const submit = async (e) => {
+    e.preventDefault();
+    if (pass.length < 6) {
+      setError('Passphrase must be at least 6 characters.');
+      return;
+    }
+    if (pass !== confirm) {
+      setError('The two passphrases do not match.');
+      return;
+    }
+    setBusy(true);
+    const r = await Auth.completePasswordReset({ email, password: pass });
+    setBusy(false);
+    if (!r.ok) { setError(r.error); return; }
+    onAuthed(r.session);
+  };
+
+  return (
+    <main className="haauth__main">
+      {onBack && (
+        <button type="button" className="haauth__back" onClick={onBack}>
+          <span className="haauth__back-arrow" aria-hidden="true">←</span>
+          <span>Return to sign in</span>
+        </button>
+      )}
+
+      <span className="haauth__overline haauth__rise">Restoration of Access</span>
+      <h1 className="haauth__title haauth__rise" style={{ animationDelay: '60ms' }}>
+        File a new passphrase.
+      </h1>
+      <p className="haauth__lede haauth__rise" style={{ animationDelay: '140ms' }}>
+        Enter the passphrase that will replace the one on file.
+        Six characters or more.
+      </p>
+
+      <form className="haauth__form haauth__rise" onSubmit={submit}
+            style={{ animationDelay: '220ms' }} noValidate>
+        <div className="haauth__field">
+          <label className="haauth__label" htmlFor="reset-pass">
+            <span>New Passphrase</span>
+            <span className="haauth__label-hint">six characters or more</span>
+          </label>
+          <input
+            id="reset-pass"
+            type="password"
+            autoComplete="new-password"
+            className={'haauth__input' + (error ? ' is-error' : '')}
+            value={pass}
+            onChange={(e) => { setPass(e.target.value); setError(null); }}
+            placeholder="••••••••"
+          />
+        </div>
+        <div className="haauth__field">
+          <label className="haauth__label" htmlFor="reset-confirm">
+            <span>Confirm Passphrase</span>
+          </label>
+          <input
+            id="reset-confirm"
+            type="password"
+            autoComplete="new-password"
+            className={'haauth__input' + (error ? ' is-error' : '')}
+            value={confirm}
+            onChange={(e) => { setConfirm(e.target.value); setError(null); }}
+            placeholder="••••••••"
+          />
+          {error && <span className="haauth__error">{error}</span>}
+        </div>
+        <button type="submit" className="haauth__submit" disabled={busy}>
+          <span>{busy ? 'Filing…' : 'File New Passphrase'}</span>
+          <span className="haauth__submit-arrow" aria-hidden="true">→</span>
+        </button>
+      </form>
+    </main>
+  );
+}
+
 function AuthScreen({ onAuthed, initialStep }) {
   const [step, setStep] = React.useState(initialStep || 'signin');
+  const [recoverEmail, setRecoverEmail] = React.useState('');
 
-  const folio = step === 'signin'
-    ? 'Members Entrance'
-    : step === 'passcode'
-    ? 'Passcode Required'
-    : 'Registration';
+  const folio =
+    step === 'signin'   ? 'Members Entrance'  :
+    step === 'passcode' ? 'Passcode Required' :
+    step === 'signup'   ? 'Registration'      :
+    step === 'recover'  ? 'Restoration'       :
+    step === 'reset'    ? 'New Passphrase'    : '';
 
   return (
     <div className="haauth">
@@ -430,6 +587,10 @@ function AuthScreen({ onAuthed, initialStep }) {
         <SignInPanel
           onAuthed={onAuthed}
           onWantSignUp={() => setStep('passcode')}
+          onWantRecover={(typedEmail) => {
+            setRecoverEmail(typedEmail || '');
+            setStep('recover');
+          }}
         />
       )}
       {step === 'passcode' && (
@@ -442,6 +603,20 @@ function AuthScreen({ onAuthed, initialStep }) {
         <SignUpPanel
           onAuthed={onAuthed}
           onBack={() => setStep('passcode')}
+        />
+      )}
+      {step === 'recover' && (
+        <RecoverPanel
+          initialEmail={recoverEmail}
+          onSentToReset={(em) => { setRecoverEmail(em); setStep('reset'); }}
+          onBack={() => setStep('signin')}
+        />
+      )}
+      {step === 'reset' && (
+        <ResetPanel
+          email={recoverEmail}
+          onAuthed={onAuthed}
+          onBack={initialStep === 'reset' ? null : () => setStep('signin')}
         />
       )}
 

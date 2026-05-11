@@ -7,6 +7,8 @@
 //   signIn({email,password})              -> {ok, session?, error?}
 //   signUp({name,email,password,photo})   -> {ok, session?, error?}
 //   signInWithGoogle()                    -> {ok, session?, error?}
+//   requestPasswordReset({email})         -> {ok, error?, devReset?}
+//   completePasswordReset({email,password}) -> {ok, session?, error?}
 //   signOut()                             -> void
 //   updateUser({oldEmail,name,email,password,currentPassword})
 //                                         -> {ok, session?, error?}
@@ -143,6 +145,53 @@ export async function signUp({ name, email, password, photo }) {
   return { ok: true, session: sessionFromUser(data.user, profile) };
 }
 
+// Dev mode short-circuits the email step: if the address is on file we return
+// devReset: true so the UI can advance to set-passphrase inline. We don't
+// leak existence either way — the wording stays "if on file".
+export async function requestPasswordReset({ email }) {
+  const addr = (email || '').trim();
+  if (!addr) return { ok: false, error: 'An email of record is required.' };
+
+  if (!isLive()) {
+    const users = loadUsersLocal();
+    const found = users.some((u) => u.email.toLowerCase() === addr.toLowerCase());
+    return { ok: true, devReset: found };
+  }
+  const { error } = await supabase.auth.resetPasswordForEmail(addr, {
+    redirectTo: window.location.origin,
+  });
+  if (error) return { ok: false, error: error.message };
+  return { ok: true };
+}
+
+// Live mode relies on Supabase's recovery session (established when the user
+// follows the email link). Dev mode looks the user up by email.
+export async function completePasswordReset({ email, password }) {
+  if (!password || password.length < 6) {
+    return { ok: false, error: 'Passphrase must be at least 6 characters.' };
+  }
+  if (!isLive()) {
+    const users = loadUsersLocal();
+    const idx = users.findIndex(
+      (u) => u.email.toLowerCase() === (email || '').toLowerCase()
+    );
+    if (idx < 0) return { ok: false, error: 'That email is no longer on file.' };
+    users[idx] = { ...users[idx], password };
+    saveUsersLocal(users);
+    const session = {
+      email: users[idx].email,
+      name:  users[idx].name,
+      photo: users[idx].photo,
+    };
+    saveSessionLocal(session);
+    return { ok: true, session };
+  }
+  const { data, error } = await supabase.auth.updateUser({ password });
+  if (error) return { ok: false, error: error.message };
+  const profile = await fetchProfile(data.user && data.user.id);
+  return { ok: true, session: sessionFromUser(data.user, profile) };
+}
+
 export async function signInWithGoogle() {
   if (!isLive()) {
     const session = {
@@ -258,14 +307,14 @@ export async function updatePhoto({ email, photo }) {
 
 export function onAuthStateChange(callback) {
   if (!isLive()) return { unsubscribe: () => {} };
-  const { data } = supabase.auth.onAuthStateChange((_event, session) => {
-    if (!session) { callback(null); return; }
+  const { data } = supabase.auth.onAuthStateChange((event, session) => {
+    if (!session) { callback(null, event); return; }
     // Defer the profile fetch out of the callback — supabase-js holds an
     // internal auth lock while running onAuthStateChange callbacks, and any
     // Supabase query awaited from inside the callback deadlocks on that lock.
     setTimeout(async () => {
       const profile = await fetchProfile(session.user.id);
-      callback(sessionFromUser(session.user, profile));
+      callback(sessionFromUser(session.user, profile), event);
     }, 0);
   });
   return { unsubscribe: () => data.subscription.unsubscribe() };

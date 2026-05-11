@@ -9,7 +9,8 @@ import { capturePng, uploadCertificate, download, slugify } from '../lib/certifi
 export const DEFAULT_CERT = {
   org:        'Hybrid Athletes',
   title:      'Hybrid Athlete of the Week',
-  weekLabel:  'Week 14 · April 28, 2026',
+  weekLabel:  'No. 14 · April 28, 2026',
+  determinationNumber: 14,
   recipients: ['Mr. W. Clifford'],
   body:
     'Mr. W. Clifford completed the 2026 London Marathon in a time of 2:58:41, ' +
@@ -113,8 +114,8 @@ export function CertificateShare({ data = DEFAULT_CERT, speech = DEFAULT_SPEECH 
 
   const filename = () => {
     const slug = slugify(data.recipients[0]);
-    const wk = (data.weekLabel.match(/Week\s+(\d+)/i) || [])[1] || 'x';
-    return `hybrid-athletes-w${wk}-${slug}.png`;
+    const num = data.determinationNumber ?? 'x';
+    return `hybrid-athletes-d${num}-${slug}.png`;
   };
 
   const renderPng = async () => capturePng(certRef.current);
@@ -124,11 +125,9 @@ export function CertificateShare({ data = DEFAULT_CERT, speech = DEFAULT_SPEECH 
   // attach to the determinations row in a follow-up.
   const archive = async (blob) => {
     if (!blob) return;
-    const wkMatch = data.weekLabel.match(/Week\s+(\d+)/i);
-    const week = wkMatch ? Number(wkMatch[1]) : 0;
     const recipientSlug = slugify(data.recipients[0]);
     try {
-      await uploadCertificate(blob, { week, recipientSlug });
+      await uploadCertificate(blob, { determinationNumber: data.determinationNumber ?? 0, recipientSlug });
     } catch (e) {
       console.warn('certificate archive failed', e);
     }

@@ -70,7 +70,7 @@ function Avatar({ initials, photoUrl, size = 64 }) {
   );
 }
 
-function CertificatePreview({ recipients, body, week, determinationNo, issuer }) {
+function CertificatePreview({ recipients, body, determinationNo, issuer }) {
   const namesLine = recipients.length
     ? recipients.map(r => r.name).join(' & ')
     : '—';
@@ -147,7 +147,7 @@ function IssueScreen({ issuer }) {
   const [filed, setFiled] = React.useState(false);
   const [members, setMembers] = React.useState([]);
   const [awardNo, setAwardNo] = React.useState(null);
-  const [nextWeek, setNextWeek] = React.useState(null);
+  const [nextDeterminationNumber, setNextDeterminationNumber] = React.useState(null);
 
   React.useEffect(() => {
     let cancelled = false;
@@ -163,7 +163,7 @@ function IssueScreen({ issuer }) {
     listDeterminations().then(records => {
       if (cancelled) return;
       setAwardNo(records.length + 1);
-      setNextWeek(records.length ? records[0].week + 1 : 1);
+      setNextDeterminationNumber(records.length ? records[0].determinationNumber + 1 : 1);
     });
     return () => { cancelled = true; };
   }, []);
@@ -234,11 +234,11 @@ function IssueScreen({ issuer }) {
   };
 
   const fileDetermination = async () => {
-    if (nextWeek == null) return;
+    if (nextDeterminationNumber == null) return;
     setConfirmOpen(false);
     const winners = selectedMembers.map(m => m.name);
     await createDetermination({
-      week: nextWeek,
+      determinationNumber: nextDeterminationNumber,
       winners,
       determiner: issuer.hybridProfile,
       determinedOn: new Date().toLocaleDateString('en-US', {
@@ -252,7 +252,7 @@ function IssueScreen({ issuer }) {
   };
 
   const canGenerate = selectedMembers.length > 0 && speech.trim().length > 0 && genState !== 'loading' && !filed;
-  const canSubmit = selectedMembers.length > 0 && speech.trim().length > 0 && genState === 'ready' && !filed && nextWeek != null;
+  const canSubmit = selectedMembers.length > 0 && speech.trim().length > 0 && genState === 'ready' && !filed && nextDeterminationNumber != null;
 
   return (
     <div className="hahome haissue">
@@ -446,7 +446,6 @@ function IssueScreen({ issuer }) {
           <CertificatePreview
             recipients={selectedMembers}
             body={generated}
-            week={nextWeek ?? '—'}
             determinationNo={awardNo ?? '—'}
             issuer={issuedBy}
           />

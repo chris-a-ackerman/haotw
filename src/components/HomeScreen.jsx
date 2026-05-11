@@ -7,7 +7,18 @@ import { Certificate } from './Certificate.jsx';
 
 const delay = (n) => ({ style: { animationDelay: `${n}ms` } });
 
-function HomeScreen({ isChampion = false, determination }) {
+function formatFiledDate(value) {
+  if (!value) return '';
+  const isoMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  if (isoMatch) {
+    const [, y, m, d] = isoMatch;
+    return new Date(Number(y), Number(m) - 1, Number(d))
+      .toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  }
+  return value;
+}
+
+function HomeScreen({ isChampion = false, determination, determinationNo }) {
   if (!determination) {
     return (
       <div className="hahome">
@@ -21,7 +32,8 @@ function HomeScreen({ isChampion = false, determination }) {
   const cert = {
     org:        'Hybrid Athletes',
     title:      determination.winners.length > 1 ? 'Hybrid Athletes of the Week' : 'Hybrid Athlete of the Week',
-    weekLabel:  `Week ${determination.week} · ${determination.determinedOn}`,
+    weekLabel:  `No. ${determination.determinationNumber} · ${determination.determinedOn}`,
+    determinationNumber: determination.determinationNumber,
     recipients: determination.winners,
     body:       determination.citation,
     determinedBy: determination.determiner,
@@ -29,6 +41,7 @@ function HomeScreen({ isChampion = false, determination }) {
   };
 
   const determinerFirst = (determination.determiner || '').split(' ')[0];
+  const today = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
 
   return (
     <div className="hahome">
@@ -50,7 +63,7 @@ function HomeScreen({ isChampion = false, determination }) {
         <hr className="hahome__rule hahome__rule--top hahome__draw" {...delay(180)} />
 
         <div className="hahome__folio hahome__rise" {...delay(300)}>
-          <span className="hahome__folio-l">May 8</span>
+          <span className="hahome__folio-l">{today}</span>
           <span className="hahome__folio-c">The Committee</span>
           <span className="hahome__folio-r" aria-hidden="true"></span>
         </div>
@@ -58,9 +71,6 @@ function HomeScreen({ isChampion = false, determination }) {
 
       <main className="hahome__main">
         <a href="record.html" className="hahome__weekbadge hahome__weekbadge--link hahome__rise" {...delay(440)}>
-          <span className="hahome__weekbadge-tick" aria-hidden="true">§</span>
-          <span>Week {determination.week}</span>
-          <span className="hahome__weekbadge-dot" aria-hidden="true">·</span>
           <span>Official Record</span>
           <span className="hahome__weekbadge-arrow" aria-hidden="true">→</span>
         </a>
@@ -80,7 +90,7 @@ function HomeScreen({ isChampion = false, determination }) {
         <figure className="hahome__cert hahome__rise" {...delay(940)}>
           <div className="hahome__cert-overline">
             <span>Certificate of Determination</span>
-            <span className="hahome__cert-overline-r">No. CXLVII</span>
+            <span className="hahome__cert-overline-r">No. {determinationNo ?? '—'}</span>
           </div>
           <div className="hahome__cert-stage" aria-label="Certificate of Determination, framed">
             <div className="hahome__cert-shrink">
@@ -97,11 +107,7 @@ function HomeScreen({ isChampion = false, determination }) {
         <div className="hahome__attest hahome__rise" {...delay(1440)}>
           <div className="hahome__attest-row">
             <span className="hahome__attest-l">Filed</span>
-            <span className="hahome__attest-r">Filed at Boston, Mass. &middot; 18:42 EDT</span>
-          </div>
-          <div className="hahome__attest-row">
-            <span className="hahome__attest-l">Determination</span>
-            <span className="hahome__attest-r">No. CXLVII &middot; affirmed</span>
+            <span className="hahome__attest-r">{formatFiledDate(determination.determinedOn)}</span>
           </div>
         </div>
 
@@ -118,7 +124,7 @@ function HomeScreen({ isChampion = false, determination }) {
       <div className="hahome__colophon">
         <span>The Committee</span>
         <span>Hybrid Athlete of the Week</span>
-        <span>May 8</span>
+        <span>{today}</span>
       </div>
     </div>
   );

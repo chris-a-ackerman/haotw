@@ -5,7 +5,7 @@
 --   profiles         — app metadata for each auth user (name, photo, claim)
 --   hybrid_profiles  — the seeded 14-name roster
 --   profile_claims   — one auth user ↔ one hybrid_profile
---   determinations   — the official record (one row per week)
+--   determinations   — the official record (one row per determination)
 --
 -- Storage buckets:
 --   certificates — public PNGs of the shareable artifacts
@@ -48,7 +48,7 @@ create unique index if not exists profile_claims_user_unique on public.profile_c
 -- ─────────────────────────────────────────────────────────────────────
 create table if not exists public.determinations (
   id uuid primary key default gen_random_uuid(),
-  week int not null unique,
+  determination_number int not null unique,
   is_current boolean not null default false,
   winners text[] not null,
   determiner text not null,

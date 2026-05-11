@@ -12,7 +12,7 @@ const NOTICE_DATA = {
   membership: { short: 'The Membership' },
 };
 
-const statesFor = (weekLabel) => ({
+const statesFor = (numberLabel) => ({
   1: {
     overline: 'Determination Pending',
     title: 'Determination Pending',
@@ -22,7 +22,7 @@ const statesFor = (weekLabel) => ({
     body: (
       <>
         This office has not received a determination for{' '}
-        <strong>Week {weekLabel}</strong>. The Committee respectfully requests
+        <strong>No. {numberLabel}</strong>. The Committee respectfully requests
         that the reigning champion fulfill their obligations at their
         earliest convenience.
       </>
@@ -37,7 +37,7 @@ const statesFor = (weekLabel) => ({
     titleTone: '',
     body: (
       <>
-        The record for <strong>Week {weekLabel}</strong> remains incomplete.
+        The record for <strong>No. {numberLabel}</strong> remains incomplete.
         The reigning champion has yet to discharge their obligations
         to the membership. The Committee notes this with increasing
         concern.
@@ -46,15 +46,15 @@ const statesFor = (weekLabel) => ({
     signoff: 'In the interest of the record,',
   },
   5: {
-    overline: `Formal Notice — Week ${weekLabel}`,
-    title: `Formal Notice — Week ${weekLabel}`,
+    overline: `Formal Notice — No. ${numberLabel}`,
+    title: `Formal Notice — No. ${numberLabel}`,
     stamp: { label: 'On Record · 5+ days', tone: 'err' },
     counter: { label: '05 days past deadline', tone: 'err' },
     titleTone: 'err',
     body: (
       <>
         The Committee has noted, with considerable disappointment, the
-        continued absence of a determination for <strong>Week {weekLabel}</strong>.
+        continued absence of a determination for <strong>No. {numberLabel}</strong>.
         The membership is aware. The record will reflect the delay.
         This is not a good look.
       </>
@@ -88,9 +88,9 @@ function Seal({ size = 44 }) {
   );
 }
 
-function Letter({ daysKey, isChampion, week }) {
-  const weekLabel = week ?? '—';
-  const s = statesFor(weekLabel)[daysKey];
+function Letter({ daysKey, isChampion, number }) {
+  const numberLabel = number ?? '—';
+  const s = statesFor(numberLabel)[daysKey];
   const isErr = s.titleTone === 'err';
 
   return (
@@ -126,7 +126,7 @@ function Letter({ daysKey, isChampion, week }) {
       <div {...rise('hanotice__meta', 1)}>
         <div className="hanotice__meta-row">
           <span className="hanotice__meta-l">In re</span>
-          <span className="hanotice__meta-r">Week {weekLabel} · May 8</span>
+          <span className="hanotice__meta-r">No. {numberLabel} · May 8</span>
         </div>
         <div className="hanotice__meta-row">
           <span className="hanotice__meta-l">Recipient</span>
@@ -140,7 +140,7 @@ function Letter({ daysKey, isChampion, week }) {
         </div>
         <div className="hanotice__meta-row">
           <span className="hanotice__meta-l">Ref. No.</span>
-          <span className="hanotice__meta-r">N-W{weekLabel}-{String(daysKey).padStart(2, '0')}</span>
+          <span className="hanotice__meta-r">N-D{numberLabel}-{String(daysKey).padStart(2, '0')}</span>
         </div>
       </div>
 
@@ -194,13 +194,13 @@ function Letter({ daysKey, isChampion, week }) {
 
 function NoticeScreen({ isChampion = true }) {
   const [days, setDays] = React.useState(1);
-  const [pendingWeek, setPendingWeek] = React.useState(null);
+  const [pendingDeterminationNumber, setPendingDeterminationNumber] = React.useState(null);
 
   React.useEffect(() => {
     let cancelled = false;
     listDeterminations().then(records => {
       if (cancelled) return;
-      setPendingWeek(records.length ? records[0].week + 1 : 1);
+      setPendingDeterminationNumber(records.length ? records[0].determinationNumber + 1 : 1);
     });
     return () => { cancelled = true; };
   }, []);
@@ -249,7 +249,7 @@ function NoticeScreen({ isChampion = true }) {
           </span>
         </div>
 
-        <Letter daysKey={days} isChampion={isChampion} week={pendingWeek} />
+        <Letter daysKey={days} isChampion={isChampion} number={pendingDeterminationNumber} />
 
         <p className="hanotice__notebelow">
           {isChampion
@@ -262,7 +262,7 @@ function NoticeScreen({ isChampion = true }) {
 
       <div className="hahome__colophon">
         <span>The Committee</span>
-        <span>Notice · Week {pendingWeek ?? '—'}</span>
+        <span>Notice · No. {pendingDeterminationNumber ?? '—'}</span>
         <span>May 8</span>
       </div>
     </div>

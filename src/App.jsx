@@ -15,6 +15,7 @@ import ClaimScreen from './components/ClaimScreen.jsx';
 import AuthScreen from './components/AuthScreen.jsx';
 import AccountSheet from './components/AccountSheet.jsx';
 import { CertificateShare } from './components/Certificate.jsx';
+import AdminBackfill from './components/AdminBackfill.jsx';
 
 const HREF_TO_VIEW = {
   'index.html':       'home',
@@ -23,6 +24,7 @@ const HREF_TO_VIEW = {
   'issue.html':       'crown',
   'certificate.html': 'certificate',
   'notice.html':      'notice',
+  'admin-backfill.html': 'admin-backfill',
 };
 
 const NAV_ITEMS_BASE = [
@@ -191,6 +193,7 @@ function App() {
   const [exitConfirm, setExitConfirm] = React.useState(false);
   const [authReady, setAuthReady] = React.useState(false);
   const [session, setSession] = React.useState(null);
+  const [recoveryMode, setRecoveryMode] = React.useState(false);
   const [certPayload, setCertPayload] = React.useState(null);
   const [determinations, setDeterminations] = React.useState([]);
 
@@ -218,8 +221,9 @@ function App() {
         console.error('Auth.loadSession() failed:', err);
         setAuthReady(true);
       });
-    const sub = Auth.onAuthStateChange((s) => {
+    const sub = Auth.onAuthStateChange((s, event) => {
       if (cancelled) return;
+      if (event === 'PASSWORD_RECOVERY') setRecoveryMode(true);
       setSession(s);
       setAuthReady(true);
     });
@@ -227,6 +231,7 @@ function App() {
   }, []);
 
   const onAuthed = React.useCallback((s) => {
+    setRecoveryMode(false);
     setSession(s);
     setView('home');
     requestAnimationFrame(() => window.scrollTo(0, 0));
@@ -239,6 +244,7 @@ function App() {
 
   const onSignOut = React.useCallback(async () => {
     await Auth.signOut();
+    setRecoveryMode(false);
     setSession(null);
   }, []);
 
@@ -289,6 +295,9 @@ function App() {
   if (!authReady) {
     return <div className="haauth" aria-busy="true" />;
   }
+  if (recoveryMode) {
+    return <AuthScreen onAuthed={onAuthed} initialStep="reset" />;
+  }
   if (!session) {
     return <AuthScreen onAuthed={onAuthed} />;
   }
@@ -298,16 +307,17 @@ function App() {
 
   // Render
   let screen = null;
-  if (view === 'home')         screen = <HomeScreen isChampion={isChampion} determination={latestDetermination} />;
+  if (view === 'home')         screen = <HomeScreen isChampion={isChampion} determination={latestDetermination} determinationNo={determinations.length} />;
   else if (view === 'archive') screen = (
     <RecordScreen
       onViewCertificate={(entry) => {
-        const wkLabel = `Week ${String(entry.week).padStart(2, '0')} · ${entry.determinedOn}`;
+        const folioLabel = `No. ${entry.determinationNumber} · ${entry.determinedOn}`;
         setCertPayload({
           data: {
             org:        'Hybrid Athletes',
             title:      entry.winners.length > 1 ? 'Hybrid Athletes of the Week' : 'Hybrid Athlete of the Week',
-            weekLabel:  wkLabel,
+            weekLabel:  folioLabel,
+            determinationNumber: entry.determinationNumber,
             recipients: entry.winners,
             body:       entry.citation,
             determinedBy: entry.determiner,
@@ -348,6 +358,7 @@ function App() {
     );
   }
   else if (view === 'notice')  screen = <NoticeScreen isChampion={isChampion} />;
+  else if (view === 'admin-backfill') screen = <AdminBackfill session={session} />;
 
   return (
     <>
