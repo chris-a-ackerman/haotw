@@ -194,30 +194,6 @@
   color: var(--baa-blue);
   margin-left: 4px;
 }
-.hastat__streak {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 9px 5px 8px;
-  background: var(--baa-yellow);
-  color: var(--ink);
-  border: 0.5px solid var(--ink);
-  border-radius: 1px;
-  font-family: var(--font-sans);
-  font-weight: 700;
-  font-size: 9.5px;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-}
-.hastat__streak-tick {
-  font-family: var(--font-display);
-  font-style: italic;
-  font-weight: 500;
-  font-size: 12px;
-  letter-spacing: 0;
-  line-height: 1;
-}
-
 /* ---------- table ------------------------------------------------ */
 .hastat__table-wrap {
   padding: 0 var(--app-pad-x);
@@ -270,7 +246,6 @@
 .hastat__thead th.col-num   { width: 26px; text-align: right; padding-right: 8px; }
 .hastat__thead th.col-name  { }
 .hastat__thead th.col-wins  { width: 38px; text-align: right; }
-.hastat__thead th.col-strk  { width: 38px; text-align: right; }
 .hastat__thead th.col-last  { width: 78px; text-align: right; }
 
 .hastat__row {
@@ -304,7 +279,6 @@
   line-height: 1.2;
 }
 .hastat__wins,
-.hastat__strk,
 .hastat__last {
   text-align: right;
   font-family: var(--font-mono);
@@ -322,12 +296,8 @@
   text-transform: uppercase;
   color: var(--ink-2);
 }
-.hastat__strk--zero,
 .hastat__wins--zero {
   color: var(--ink-3);
-}
-.hastat__strk-em {
-  color: var(--baa-blue);
 }
 
 /* rank treatments ------------------------------------------------- */

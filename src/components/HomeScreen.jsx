@@ -87,20 +87,28 @@ function HomeScreen({ isChampion = false, determination, determinationNo }) {
           <span>{determination.determinedOn}</span>
         </div>
 
-        <figure className="hahome__cert hahome__rise" {...delay(940)}>
-          <div className="hahome__cert-overline">
-            <span>Certificate of Determination</span>
-            <span className="hahome__cert-overline-r">No. {determinationNo ?? '—'}</span>
-          </div>
-          <div className="hahome__cert-stage" aria-label="Certificate of Determination, framed">
-            <div className="hahome__cert-shrink">
-              <Certificate data={cert} />
+        <a
+          href="/?view=certificate"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hahome__cert-link"
+          aria-label="Open certificate in a new tab"
+        >
+          <figure className="hahome__cert hahome__rise" {...delay(940)}>
+            <div className="hahome__cert-overline">
+              <span>Certificate of Determination</span>
+              <span className="hahome__cert-overline-r">No. {determinationNo ?? '—'}</span>
             </div>
-          </div>
-          <figcaption className="hahome__cert-cap">
-            Issued under seal by The Committee &middot; affixed for public viewing
-          </figcaption>
-        </figure>
+            <div className="hahome__cert-stage" aria-label="Certificate of Determination, framed">
+              <div className="hahome__cert-shrink">
+                <Certificate data={cert} />
+              </div>
+            </div>
+            <figcaption className="hahome__cert-cap">
+              Issued under seal by The Committee &middot; affixed for public viewing
+            </figcaption>
+          </figure>
+        </a>
 
         <hr className="hahome__rule hahome__rule--soft hahome__draw" {...delay(1000)} />
 

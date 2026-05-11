@@ -187,7 +187,16 @@ function ExitConfirmModal({ open, onCancel, onConfirm }) {
 }
 
 function App() {
-  const [view, setView] = React.useState('home');
+  // A new tab opened with ?view=certificate boots straight into the standalone
+  // certificate view. `standalone` then sticks for the life of the tab so the
+  // chrome (hamburger, Return link) stays hidden even if the user navigates.
+  const initialView = React.useMemo(() => {
+    if (typeof window === 'undefined') return 'home';
+    const params = new URLSearchParams(window.location.search);
+    return params.get('view') === 'certificate' ? 'certificate' : 'home';
+  }, []);
+  const [view, setView] = React.useState(initialView);
+  const [standalone] = React.useState(initialView === 'certificate');
   const [menuOpen, setMenuOpen] = React.useState(false);
   const [accountOpen, setAccountOpen] = React.useState(false);
   const [exitConfirm, setExitConfirm] = React.useState(false);
@@ -256,7 +265,8 @@ function App() {
     refreshDeterminations();
   }, [session, refreshDeterminations]);
   React.useEffect(() => {
-    if (view !== 'home' || !session) return;
+    if (!session) return;
+    if (view !== 'home' && view !== 'certificate') return;
     refreshDeterminations();
   }, [view, session, refreshDeterminations]);
 
@@ -277,6 +287,7 @@ function App() {
     const onClick = (e) => {
       const a = e.target.closest && e.target.closest('a[href]');
       if (!a) return;
+      if (a.target === '_blank' || e.metaKey || e.ctrlKey || e.shiftKey) return;
       const href = a.getAttribute('href');
       if (!href) return;
       const clean = href.replace(/^\.\//, '').split('?')[0].split('#')[0];
@@ -331,6 +342,44 @@ function App() {
   );
   else if (view === 'stats')   screen = <StatsScreen />;
   else if (view === 'crown')   screen = <IssueScreen issuer={session} />;
+  else if (view === 'certificate' && standalone) {
+    if (!latestDetermination) {
+      screen = (
+        <div className="hahome">
+          <main className="hahome__main">
+            <div className="hahome__inre">Awaiting first Determination</div>
+          </main>
+        </div>
+      );
+    } else {
+      const standaloneCert = {
+        org:        'Hybrid Athletes',
+        title:      latestDetermination.winners.length > 1 ? 'Hybrid Athletes of the Week' : 'Hybrid Athlete of the Week',
+        weekLabel:  `No. ${latestDetermination.determinationNumber} · ${latestDetermination.determinedOn}`,
+        determinationNumber: latestDetermination.determinationNumber,
+        recipients: latestDetermination.winners,
+        body:       latestDetermination.citation,
+        determinedBy: latestDetermination.determiner,
+        est:        'Est. 2023',
+      };
+      screen = (
+        <div className="hahome">
+          <header className="hahome__masthead">
+            <div className="hahome__wordmark">
+              <span className="hahome__wordmark-text">Hybrid Athletes</span>
+            </div>
+            <hr className="hahome__rule hahome__rule--top" />
+          </header>
+          <main className="hahome__main">
+            <CertificateShare
+              data={standaloneCert}
+              speech={latestDetermination.speech || undefined}
+            />
+          </main>
+        </div>
+      );
+    }
+  }
   else if (view === 'certificate') {
     screen = (
       <div className="hahome">
@@ -364,18 +413,22 @@ function App() {
     <>
       {screen}
 
-      <HamburgerButton onOpen={() => setMenuOpen(true)} />
+      {!standalone && (
+        <>
+          <HamburgerButton onOpen={() => setMenuOpen(true)} />
 
-      <HamburgerDrawer
-        open={menuOpen}
-        onClose={() => setMenuOpen(false)}
-        currentView={view}
-        isChampion={isChampion}
-        onNavigate={navigate}
-        session={session}
-        onSignOut={onSignOut}
-        onOpenAccount={() => setAccountOpen(true)}
-      />
+          <HamburgerDrawer
+            open={menuOpen}
+            onClose={() => setMenuOpen(false)}
+            currentView={view}
+            isChampion={isChampion}
+            onNavigate={navigate}
+            session={session}
+            onSignOut={onSignOut}
+            onOpenAccount={() => setAccountOpen(true)}
+          />
+        </>
+      )}
 
       <AccountSheet
         open={accountOpen}

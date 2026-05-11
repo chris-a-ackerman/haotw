@@ -28,9 +28,6 @@ function Row({ m, i }) {
       <td className={'hastat__wins' + (m.wins === 0 ? ' hastat__wins--zero' : '')}>
         {m.wins}
       </td>
-      <td className={'hastat__strk' + (m.streak === 0 ? ' hastat__strk--zero' : '')}>
-        {m.streak > 0 ? <span className="hastat__strk-em">{m.streak}w</span> : '—'}
-      </td>
       <td className="hastat__last">{m.lastCrowned}</td>
     </motion.tr>
   );
@@ -118,12 +115,6 @@ function StatsScreen() {
                     <span className="hastat__leader-wins">{leader.wins}</span>
                     <span className="hastat__leader-wins-unit">wins</span>
                   </span>
-                  {leader.streak > 0 && (
-                    <span className="hastat__streak">
-                      <span className="hastat__streak-tick" aria-hidden="true">§</span>
-                      <span>Current streak: {leader.streak} weeks</span>
-                    </span>
-                  )}
                 </Rise>
               </>
             ) : (
@@ -146,7 +137,6 @@ function StatsScreen() {
                 <tr>
                   <th className="col-name" scope="col">Name</th>
                   <th className="col-wins" scope="col">Wins</th>
-                  <th className="col-strk" scope="col">Streak</th>
                   <th className="col-last" scope="col">Last Crowned</th>
                 </tr>
               </thead>
@@ -168,26 +158,6 @@ function StatsScreen() {
               <span className="hastat__notable-folio">Appendix A</span>
             </div>
             <ul className="hastat__notable-list">
-              {notable.longestStreak && (
-                <li className="hastat__notable-item">
-                  <div className="hastat__notable-label">Longest Streak</div>
-                  <div className="hastat__notable-value">
-                    {notable.longestStreak.who}
-                    {' · '}
-                    <span className="hastat__notable-value-em">
-                      {notable.longestStreak.weeks} consecutive weeks
-                    </span>
-                    {notable.longestStreak.when && (
-                      <>
-                        {' '}
-                        <span className="hastat__notable-value-paren">
-                          ({notable.longestStreak.when})
-                        </span>
-                      </>
-                    )}
-                  </div>
-                </li>
-              )}
               <li className="hastat__notable-item">
                 <div className="hastat__notable-label">Co-Determinations Issued</div>
                 <div className="hastat__notable-value">

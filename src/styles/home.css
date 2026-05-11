@@ -250,13 +250,8 @@ body {
 .hahome__cert-stage {
   margin-top: 10px;
   padding: 10px;
-  background: #1A1A1A;
-  /* gilded corner hint without going gauche */
-  box-shadow:
-    inset 0 0 0 1px #2a2a2a,
-    inset 0 0 0 2px #1a1a1a,
-    0 1px 0 rgba(0,0,0,0.08),
-    0 8px 22px -12px rgba(0,0,0,0.45);
+  background: #FAFAF8;
+
   display: flex;
   justify-content: center;
   /* clip the shrunk certificate so its native 400×~440 doesn't overflow
@@ -282,6 +277,30 @@ body {
   line-height: 1.45;
   text-align: center;
   color: var(--ink-3);
+}
+/* Wrap the framed cert in an anchor; clicking opens a standalone tab. */
+.hahome__cert-link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  outline: none;
+}
+.hahome__cert-link:focus-visible {
+  outline: 2px solid var(--baa-blue);
+  outline-offset: 4px;
+}
+.hahome__cert-link .hahome__cert-stage {
+  transition: transform 200ms ease, box-shadow 200ms ease;
+}
+.hahome__cert-link:hover .hahome__cert-stage,
+.hahome__cert-link:focus-visible .hahome__cert-stage {
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 0 0 1px #2a2a2a,
+    inset 0 0 0 2px #1a1a1a,
+    0 2px 0 rgba(0,0,0,0.08),
+    0 14px 28px -14px rgba(0,0,0,0.5);
 }
 
 /* ---------- citation --------------------------------------------- */

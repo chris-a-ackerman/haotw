@@ -7,6 +7,27 @@ import { listDeterminations } from '../lib/records.js';
 
 const delay = (n) => ({ style: { animationDelay: `${n}ms` } });
 
+const MONTHS = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+];
+
+function ordinalSuffix(n) {
+  const mod100 = n % 100;
+  if (mod100 >= 11 && mod100 <= 13) return 'th';
+  switch (n % 10) {
+    case 1: return 'st';
+    case 2: return 'nd';
+    case 3: return 'rd';
+    default: return 'th';
+  }
+}
+
+function formatToday() {
+  const d = new Date();
+  return `${MONTHS[d.getMonth()]} ${d.getDate()}${ordinalSuffix(d.getDate())}`;
+}
+
 function Speech({ text }) {
   const paras = text.split('\n\n');
   return (
@@ -111,6 +132,7 @@ function Entry({ entry, expanded, onToggle, onViewCertificate, riseDelay }) {
 function RecordScreen({ onViewCertificate }) {
   const [openNumber, setOpenNumber] = React.useState(null);
   const [records, setRecords] = React.useState([]);
+  const today = React.useMemo(() => formatToday(), []);
 
   React.useEffect(() => {
     let cancelled = false;
@@ -146,7 +168,7 @@ function RecordScreen({ onViewCertificate }) {
         <div className="harec__meta-row harec__rise" {...delay(520)}>
           <span>Determinations 1–{records.length || 10}</span>
           <span className="harec__meta-dot" aria-hidden="true">·</span>
-          <span>May 8</span>
+          <span>{today}</span>
         </div>
       </header>
 
@@ -176,7 +198,7 @@ function RecordScreen({ onViewCertificate }) {
       <div className="harec__colophon">
         <span>The Committee</span>
         <span>Hybrid Athlete of the Week</span>
-        <span>May 8</span>
+        <span>{today}</span>
       </div>
     </div>
   );
