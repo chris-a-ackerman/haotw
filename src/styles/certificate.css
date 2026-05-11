@@ -63,6 +63,12 @@
   align-items: center;
   justify-content: center;
 }
+.cert__crest img {
+  width: 28px;
+  height: 28px;
+  display: block;
+  object-fit: contain;
+}
 .cert__org {
   font-family: var(--font-sans);
   font-weight: 700;

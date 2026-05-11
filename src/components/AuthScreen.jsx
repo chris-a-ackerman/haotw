@@ -80,17 +80,23 @@ function SignInPanel({ onAuthed, onWantSignUp }) {
 
   return (
     <main className="haauth__main">
-      <span className="haauth__overline haauth__rise">Members Entrance</span>
-      <h1 className="haauth__title haauth__rise" style={{ animationDelay: '60ms' }}>
+      <img
+        src="/ha-seal.png"
+        alt=""
+        aria-hidden="true"
+        className="haauth__seal haauth__rise"
+      />
+      <span className="haauth__overline haauth__rise" style={{ animationDelay: '60ms' }}>Members Entrance</span>
+      <h1 className="haauth__title haauth__rise" style={{ animationDelay: '120ms' }}>
         Sign in to the record.
       </h1>
-      <p className="haauth__lede haauth__rise" style={{ animationDelay: '140ms' }}>
+      <p className="haauth__lede haauth__rise" style={{ animationDelay: '200ms' }}>
         Access is reserved for Committee-recognized members.
         Present your credentials to continue.
       </p>
 
       <form className="haauth__form haauth__rise" onSubmit={submit}
-            style={{ animationDelay: '220ms' }} noValidate>
+            style={{ animationDelay: '280ms' }} noValidate>
         <div className="haauth__field">
           <label className="haauth__label" htmlFor="auth-email">
             <span>Email of Record</span>
@@ -128,17 +134,17 @@ function SignInPanel({ onAuthed, onWantSignUp }) {
         </button>
       </form>
 
-      <div className="haauth__or haauth__rise" style={{ animationDelay: '300ms' }}>
+      <div className="haauth__or haauth__rise" style={{ animationDelay: '360ms' }}>
         <span>Or</span>
       </div>
 
       <button type="button" className="haauth__google haauth__rise"
-              onClick={google} style={{ animationDelay: '340ms' }} disabled={busy}>
+              onClick={google} style={{ animationDelay: '400ms' }} disabled={busy}>
         <GoogleMark />
         <span>Continue with Google</span>
       </button>
 
-      <div className="haauth__swap haauth__rise" style={{ animationDelay: '400ms' }}>
+      <div className="haauth__swap haauth__rise" style={{ animationDelay: '460ms' }}>
         <span>Not yet on the rolls?</span>
         <button type="button" className="haauth__swap-link" onClick={onWantSignUp}>
           Register

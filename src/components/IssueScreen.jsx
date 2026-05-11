@@ -103,19 +103,7 @@ function CertificatePreview({ recipients, body, week, determinationNo, issuer })
           <span className="haissue__certpaper-signame">{shortName(issuer.name)}</span>
         </div>
         <div className="haissue__certpaper-seal" aria-hidden="true">
-          <svg viewBox="0 0 40 40" width="40" height="40">
-            <circle cx="20" cy="20" r="18.75" fill="none" stroke="#003DA5" strokeWidth="0.6" />
-            <circle cx="20" cy="20" r="14.5"  fill="none" stroke="#003DA5" strokeWidth="0.4" />
-            <text x="20" y="17" textAnchor="middle"
-              fontFamily='"Bodoni Moda", Didot, serif' fontWeight="700" fontSize="6"
-              fill="#003DA5" letterSpacing="0.12em">THE</text>
-            <text x="20" y="24" textAnchor="middle"
-              fontFamily='"Bodoni Moda", Didot, serif' fontWeight="700" fontSize="7"
-              fill="#003DA5" letterSpacing="0.04em">CMTE</text>
-            <text x="20" y="30" textAnchor="middle"
-              fontFamily='"Archivo", sans-serif' fontWeight="700" fontSize="3.6"
-              fill="#003DA5" letterSpacing="0.18em">May 8</text>
-          </svg>
+          <img src="/ha-seal.png" alt="" className="haissue__certpaper-seal-img" />
         </div>
       </div>
     </div>

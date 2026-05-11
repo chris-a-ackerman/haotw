@@ -62,6 +62,15 @@
   flex-direction: column;
 }
 
+.haauth__seal {
+  display: block;
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 20px;
+  object-fit: contain;
+  user-select: none;
+}
+
 .haauth__overline {
   font-family: var(--font-sans);
   font-weight: 700;
@@ -88,7 +97,6 @@
   color: var(--ink-2);
   margin: 0 0 26px;
   text-wrap: pretty;
-  max-width: 32ch;
 }
 
 /* ---------- form fields ----------------------------------------------- */
@@ -331,6 +339,10 @@
   height: 16px;
   flex: 0 0 auto;
 }
+
+/* Hidden until OAuth is wired up. */
+.haauth__or,
+.haauth__google { display: none; }
 
 /* ---------- swap link (sign in <-> sign up) -------------------------- */
 .haauth__swap {

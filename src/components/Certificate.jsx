@@ -49,15 +49,7 @@ export function Certificate({ data = DEFAULT_CERT, innerRef }) {
 
           <div className="cert__head">
             <span className="cert__crest" aria-hidden="true">
-              <svg viewBox="0 0 36 36" width="28" height="28">
-                <circle cx="18" cy="18" r="17"   fill="none" stroke="#003DA5" strokeWidth="0.6"/>
-                <circle cx="18" cy="18" r="13.5" fill="none" stroke="#003DA5" strokeWidth="0.4"/>
-                <line x1="18" y1="0.5" x2="18" y2="3" stroke="#FFDB00" strokeWidth="1.2"/>
-                <text x="18" y="22.2" textAnchor="middle"
-                      fontFamily='"Bodoni Moda", Didot, serif'
-                      fontWeight="700" fontSize="11" fill="#003DA5"
-                      letterSpacing="0.02em">H·A</text>
-              </svg>
+              <img src="/ha-seal.png" alt="" width="28" height="28" loading="eager" decoding="sync" />
             </span>
             <span className="cert__org">{org}</span>
           </div>
