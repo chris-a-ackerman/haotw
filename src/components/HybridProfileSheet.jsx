@@ -71,10 +71,7 @@ function HybridProfileSheet({ open, hybridName, determinations, onClose, onViewC
     return determinations.filter((d) => (d.winners || []).includes(hybridName));
   }, [hybridName, determinations]);
 
-  // Identify the profile as "claimed" by whether we found photo/strava/
-  // achievement on the joined row. A hybrid in the roster with no claimant
-  // returns the row with all three fields null.
-  const isClaimed = !!(profile && (profile.photoUrl || profile.stravaUrl || profile.achievement));
+  const isClaimed = !!(profile && profile.claimed);
   const initial = (hybridName || '·')[0].toUpperCase();
 
   return (

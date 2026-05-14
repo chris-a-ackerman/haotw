@@ -43,7 +43,8 @@ export async function listProfiles() {
 // Roster with the claimant's portrait, strava URL, and notable achievement
 // attached when available. Used by the Issue screen (which only reads
 // `name`/`photoUrl`) and by the Hybrid Profile panel on Stats (which reads
-// every field).
+// every field). `claimed` reflects the existence of a profile_claims row —
+// it can be true even when photoUrl/stravaUrl/achievement are all null.
 export async function listProfilesWithPhotos() {
   if (!isLive()) {
     const claims = loadLocal();
@@ -58,6 +59,7 @@ export async function listProfilesWithPhotos() {
       const u = claim ? byEmail.get((claim.email || '').toLowerCase()) : null;
       return {
         name,
+        claimed:     !!claim,
         photoUrl:    u ? (u.photo       || null) : null,
         stravaUrl:   u ? (u.stravaUrl   || null) : null,
         achievement: u ? (u.achievement || null) : null,
@@ -75,7 +77,7 @@ export async function listProfilesWithPhotos() {
     logSupabaseError('listProfilesWithPhotos failed, falling back to constant',
       pErr || cErr || rErr);
     return HYBRID_PROFILES.map(name => ({
-      name, photoUrl: null, stravaUrl: null, achievement: null,
+      name, claimed: false, photoUrl: null, stravaUrl: null, achievement: null,
     }));
   }
   const extrasByUser = new Map((rows || []).map(r => [r.user_id, r]));
@@ -87,6 +89,7 @@ export async function listProfilesWithPhotos() {
     const extras = userId ? extrasByUser.get(userId) : null;
     return {
       name: p.display_name,
+      claimed:     userByProfileId.has(p.id),
       photoUrl:    extras ? (extras.photo_url   || null) : null,
       stravaUrl:   extras ? (extras.strava_url  || null) : null,
       achievement: extras ? (extras.achievement || null) : null,
