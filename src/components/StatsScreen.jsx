@@ -2,9 +2,12 @@
 // Institutional. Deadpan. The 0 is commentary enough.
 
 import React from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { loadStats } from '../lib/stats.js';
 import { listProfilesWithPhotos } from '../lib/claims.js';
+import { useAppContext } from '../context/AppContext.jsx';
+import HybridProfileSheet from './HybridProfileSheet.jsx';
 
 function formatLong(date) {
   return date.toLocaleString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
@@ -73,9 +76,21 @@ function Rise({ delay, children, as = 'div', className = '', ...rest }) {
   );
 }
 
-function StatsScreen({ onSelectHybrid }) {
+function StatsScreen() {
+  const navigate = useNavigate();
+  const { determinations } = useAppContext();
   const [stats, setStats] = React.useState(null);
   const [photoByName, setPhotoByName] = React.useState(() => new Map());
+  const [searchParams, setSearchParams] = useSearchParams();
+  const selectedHybridName = searchParams.get('profile');
+
+  const selectHybrid = React.useCallback((name) => {
+    setSearchParams(name ? { profile: name } : {}, { replace: false });
+  }, [setSearchParams]);
+
+  const viewCertificate = React.useCallback((entry) => {
+    navigate(`/certificate/${entry.determinationNumber}`, { state: { from: 'stats' } });
+  }, [navigate]);
 
   React.useEffect(() => {
     let cancelled = false;
@@ -102,10 +117,10 @@ function StatsScreen({ onSelectHybrid }) {
   return (
     <div className="hastat">
       <div className="hastat__masthead">
-        <a href="index.html" className="hastat__back">
+        <Link to="/" className="hastat__back">
           <span className="hastat__back-arrow" aria-hidden="true">←</span>
           <span>Return</span>
-        </a>
+        </Link>
         <span className="hastat__wordmark-text">Hybrid Athletes</span>
       </div>
 
@@ -176,7 +191,7 @@ function StatsScreen({ onSelectHybrid }) {
                     m={m}
                     i={i}
                     photoUrl={photoByName.get(m.name) || null}
-                    onSelect={onSelectHybrid}
+                    onSelect={selectHybrid}
                   />
                 ))}
               </tbody>
@@ -211,6 +226,14 @@ function StatsScreen({ onSelectHybrid }) {
         <span>Hybrid Athlete of the Week</span>
         <span>{todayShort}</span>
       </div>
+
+      <HybridProfileSheet
+        open={!!selectedHybridName}
+        hybridName={selectedHybridName}
+        determinations={determinations}
+        onClose={() => selectHybrid(null)}
+        onViewCertificate={viewCertificate}
+      />
     </div>
   );
 }

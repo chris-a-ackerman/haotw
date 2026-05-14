@@ -22,6 +22,10 @@ npm run preview      # serve the production bundle locally
 
 No `.env.local` required for dev. Sign up with anything; the claim flow uses the seeded 14-name roster.
 
+### Routing
+
+Client-side routing via `react-router-dom` v6. Routes: `/`, `/archive`, `/stats`, `/issue` (champion-gated), `/certificate` (latest, standalone), `/certificate/:number` (specific award), `/notice`, `/admin/backfill`. Unknown paths redirect to `/`. Deploying to a static host that doesn't auto-rewrite to `index.html` (Vercel/Netlify/Cloudflare Pages handle this) requires a SPA fallback rule, e.g. a `_redirects` file containing `/* /index.html 200`.
+
 ## Wire up Supabase
 
 1. **Create a project** at supabase.com (or run `supabase start` for local dev).
@@ -61,9 +65,10 @@ To go back to localStorage-only mode (e.g. for offline demos), rename `.env.loca
 
 ```
 src/
-├── main.jsx                # entry; CSS imports + ReactDOM.createRoot
-├── App.jsx                 # view-state, hamburger nav, anchor interception, auth/claim gates
-├── components/             # one file per screen + the certificate artifact
+├── main.jsx                # entry; CSS imports + ReactDOM.createRoot wrapped in BrowserRouter
+├── App.jsx                 # session/auth shell + route table
+├── context/AppContext.jsx  # session, determinations, isChampion provider
+├── components/             # one file per screen + AuthGate, AppLayout, ChampionRoute, CertificateScreen
 └── lib/
     ├── supabase.js         # client factory (null when env unset)
     ├── auth.js             # signIn/signUp/google/signOut + Supabase fallback

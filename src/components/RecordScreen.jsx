@@ -3,6 +3,7 @@
 // and the full original speech (the writer's voice, the real record).
 
 import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { listDeterminations } from '../lib/records.js';
 
 const delay = (n) => ({ style: { animationDelay: `${n}ms` } });
@@ -129,10 +130,15 @@ function Entry({ entry, expanded, onToggle, onViewCertificate, riseDelay }) {
   );
 }
 
-function RecordScreen({ onViewCertificate }) {
+function RecordScreen() {
+  const navigate = useNavigate();
   const [openNumber, setOpenNumber] = React.useState(null);
   const [records, setRecords] = React.useState([]);
   const today = React.useMemo(() => formatToday(), []);
+
+  const onViewCertificate = React.useCallback((entry) => {
+    navigate(`/certificate/${entry.determinationNumber}`, { state: { from: 'archive' } });
+  }, [navigate]);
 
   React.useEffect(() => {
     let cancelled = false;
@@ -145,10 +151,10 @@ function RecordScreen({ onViewCertificate }) {
   return (
     <div className="harec">
       <div className="harec__masthead harec__rise" {...delay(0)}>
-        <a href="index.html" className="harec__back">
+        <Link to="/" className="harec__back">
           <span className="harec__back-arrow" aria-hidden="true">←</span>
           <span>Return</span>
-        </a>
+        </Link>
         <div className="harec__wordmark">
           <span className="harec__wordmark-text">Hybrid Athletes</span>
         </div>

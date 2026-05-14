@@ -23,11 +23,13 @@ There are no tests and no linter wired in. There is no global type system — fi
 
 ## Architecture
 
-### View routing in `src/App.jsx`
+### Routing
 
-Single `view` state (`'home' | 'archive' | 'stats' | 'crown' | 'certificate' | 'notice' | 'award-detail'`). No React Router. A document-level click delegate intercepts `<a href="*.html">` clicks and translates them to view changes via the `HREF_TO_VIEW` map — that's why every screen still uses ordinary `href="record.html"` anchors. When you add a new screen, add the `*.html` → view-id mapping there.
+`react-router-dom` v6 with clean paths, mounted in `src/main.jsx`. Routes: `/`, `/archive`, `/stats`, `/issue` (champion-gated), `/certificate` (latest, standalone, no chrome — opened in a new tab from share), `/certificate/:number` (specific award, with Return link), `/notice`, `/admin/backfill`. Unknown paths redirect to `/`.
 
-`App.jsx` also owns the two gates that render before any screen: **auth** (no `session` → `<AuthScreen>`) and **claim** (session exists but `session.hybridProfile` is null → `<ClaimScreen>`). Both are rendered to completion before the main app mounts, so the rest of the components can assume `session` and `session.hybridProfile` exist.
+`src/App.jsx` is a thin shell: it loads the session, caches `determinations`, derives `isChampion`, and exposes it via `AppContext` (`src/context/AppContext.jsx`) so screens call `useAppContext()` rather than receive props. Two gates live in `src/components/AuthGate.jsx`: **auth** (no `session` → `<AuthScreen>`) and **claim** (`!session.hybridProfile && !claimSkipped` → `<ClaimScreen>`). Chrome (hamburger button, drawer, AccountSheet) lives in `src/components/AppLayout.jsx`. The standalone certificate route is a sibling of the layout, so a shared link reads cleanly without auth nag.
+
+When you add a new screen: drop a `<Route>` in `App.jsx`, nest it under `<AppLayout />` (most cases) or `<ChampionRoute />` for champion-only. Internal links use `<Link to="/path">`; imperative navigation uses `useNavigate()`. The certificate Return link reads `location.state.from` — pass `{ state: { from: 'archive' } }` or `'stats'` when navigating.
 
 ### Service layer in `src/lib/`
 
@@ -44,8 +46,8 @@ Every cross-cutting concern is a single file with named exports. Each one checks
 ### Component conventions
 
 - Every component is a default export, in `src/components/<Name>.jsx`. Cross-component types/helpers (e.g. `Certificate`, `DEFAULT_CERT`, `DEFAULT_SPEECH`) are named exports from the file that owns them.
-- Champion gating: `App.jsx`'s `isChampion` is currently `!!session` (every signed-in user is treated as champion). The `// TODO` near it documents the next step: derive champion status from "latest determination's `winners[]` matches active user's `hybrid_profile`".
-- `NoticeScreen` accepts `isChampion` as a prop. `IssueScreen` accepts `issuer={session}` so the certificate signature reflects who's filing.
+- Champion gating: `isChampion` is derived in `App.jsx` from the active session's `hybridProfile` matching the latest determination's `winners[]`. `<ChampionRoute>` enforces it at the route level (`/issue` bounces to `/` for non-champions).
+- Screens that need session/determinations/isChampion read them via `useAppContext()` instead of receiving props.
 - The `CertificateShare` component (in `Certificate.jsx`) is the only thing that calls `html2canvas`. When live, it also archives the captured PNG to the `certificates` Storage bucket as a side effect — silently, on download/share.
 
 ### Supabase wiring
@@ -67,11 +69,9 @@ Every cross-cutting concern is a single file with named exports. Each one checks
 
 - **Voice is the product.** Institutional, deadpan, faux-19th-century. "The Committee," "Determination," "filed," "stands," roman numerals. The wiring spec under `uploads/` is the canonical reference.
 - **Co-winner display.** `winners` is always an array. Single → render plain; ≥2 → `Name · Name` or stacked + a `CO-DETERMINATION` yellow tag. See `joinNames()` in `IssueScreen.jsx` for the canonical join.
-- **Anchor interception.** Screens use `<a href="record.html">`-style links rather than imperative `navigate()` calls. The delegate in `App.jsx` translates them. When adding a screen, register its `*.html` → view-id mapping there.
 - **localStorage seeding.** `records.js` seeds the 10-week demo dataset on first read so a fresh dev session ships with realistic data. Don't replace this with empty-state on dev — losing the seed degrades the design review experience.
 
 ## What's intentionally not wired yet
 
 - **PNG capture at file-time.** The Issue wizard saves the determination's text record but does not yet capture the certificate PNG. Capture happens when the user later clicks Download/Share from the certificate route. Either flow is fine; doing both is the cleanup.
-- **True champion detection.** See the `// TODO` in `App.jsx`. Implementing it requires querying `determinations` for the most recent row and comparing against the active user's claimed `hybrid_profile`.
 - **OAuth provider config.** `supabase/config.toml` ships with Google disabled by default. Configure it through the Supabase dashboard for a hosted project; the auth gate already calls `signInWithOAuth({ provider: 'google' })` when `isLive()`.
