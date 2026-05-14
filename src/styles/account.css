@@ -331,6 +331,30 @@
   color: var(--ink-3);
   margin-top: 2px;
 }
+.haaccount__hero-achievement {
+  margin-top: 6px;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--ink-2);
+  text-wrap: pretty;
+}
+.haaccount__hero-strava {
+  margin-top: 4px;
+  align-self: flex-start;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 9.5px;
+  letter-spacing: 0.20em;
+  text-transform: uppercase;
+  color: var(--baa-blue);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 0.5px;
+  transition: color var(--dur-quick) var(--ease-doc);
+}
+.haaccount__hero-strava:hover { color: var(--baa-blue-ink); }
 .haaccount__hero-tag {
   margin-top: 6px;
   font-family: var(--font-sans);

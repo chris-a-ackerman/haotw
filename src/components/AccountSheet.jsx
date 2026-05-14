@@ -11,9 +11,30 @@ const ROMAN_NUMERALS = [
   '', 'I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV',
 ];
 
+function isValidUrl(v) {
+  try {
+    const u = new URL(v);
+    return u.protocol === 'http:' || u.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
+function stravaHandle(url) {
+  try {
+    const u = new URL(url);
+    const tail = u.pathname.replace(/\/+$/, '').split('/').filter(Boolean).pop();
+    return tail || u.hostname.replace(/^www\./, '');
+  } catch {
+    return 'Profile';
+  }
+}
+
 function ParticularsPanel({ session, onUpdated }) {
   const [name, setName]               = React.useState(session.name || '');
   const [email, setEmail]             = React.useState(session.email || '');
+  const [stravaUrl, setStravaUrl]     = React.useState(session.stravaUrl || '');
+  const [achievement, setAchievement] = React.useState(session.achievement || '');
   const [currentPassword, setCurrent] = React.useState('');
   const [newPassword, setNewPassword] = React.useState('');
   const [error, setError]             = React.useState(null);
@@ -23,11 +44,15 @@ function ParticularsPanel({ session, onUpdated }) {
   React.useEffect(() => {
     setName(session.name || '');
     setEmail(session.email || '');
-  }, [session.name, session.email]);
+    setStravaUrl(session.stravaUrl || '');
+    setAchievement(session.achievement || '');
+  }, [session.name, session.email, session.stravaUrl, session.achievement]);
 
   const dirty =
-    (name || '').trim()  !== (session.name  || '').trim() ||
-    (email || '').trim() !== (session.email || '').trim() ||
+    (name || '').trim()        !== (session.name        || '').trim() ||
+    (email || '').trim()       !== (session.email       || '').trim() ||
+    (stravaUrl || '').trim()   !== (session.stravaUrl   || '').trim() ||
+    (achievement || '').trim() !== (session.achievement || '').trim() ||
     !!newPassword;
 
   const submit = async (e) => {
@@ -42,6 +67,11 @@ function ParticularsPanel({ session, onUpdated }) {
       setError('New passphrase must be at least 6 characters.');
       return;
     }
+    const strava = stravaUrl.trim();
+    if (strava && !isValidUrl(strava)) {
+      setError('Strava link must be a full URL.');
+      return;
+    }
     if (!currentPassword) {
       setError('Confirm your current passphrase to file changes.');
       return;
@@ -53,6 +83,8 @@ function ParticularsPanel({ session, onUpdated }) {
       email: email.trim(),
       password: newPassword || undefined,
       currentPassword,
+      stravaUrl: strava,
+      achievement: achievement.trim(),
     });
     setBusy(false);
     if (!r.ok) { setError(r.error); return; }
@@ -94,6 +126,39 @@ function ParticularsPanel({ session, onUpdated }) {
           className={'haaccount__input' + (error && /email/i.test(error) ? ' is-error' : '')}
           value={email}
           onChange={(e) => { setEmail(e.target.value); setError(null); setFiled(null); }}
+        />
+      </div>
+
+      <div className="haaccount__field">
+        <label className="haaccount__label" htmlFor="acct-strava">
+          <span>Strava Particulars</span>
+          <span className="haaccount__label-hint">optional</span>
+        </label>
+        <input
+          id="acct-strava"
+          type="url"
+          inputMode="url"
+          autoComplete="url"
+          className={'haaccount__input' + (error && /strava/i.test(error) ? ' is-error' : '')}
+          value={stravaUrl}
+          onChange={(e) => { setStravaUrl(e.target.value); setError(null); setFiled(null); }}
+          placeholder="https://www.strava.com/athletes/…"
+        />
+      </div>
+
+      <div className="haaccount__field">
+        <label className="haaccount__label" htmlFor="acct-achievement">
+          <span>Achievement of Note</span>
+          <span className="haaccount__label-hint">optional</span>
+        </label>
+        <input
+          id="acct-achievement"
+          type="text"
+          maxLength={140}
+          className="haaccount__input"
+          value={achievement}
+          onChange={(e) => { setAchievement(e.target.value); setError(null); setFiled(null); }}
+          placeholder="Boston Marathon, sub-3 hours"
         />
       </div>
 
@@ -439,6 +504,19 @@ function AccountSheet({ open, session, onClose, onSessionChange, onClaim }) {
               <span className="haaccount__hero-overline">Member of Record</span>
               <span className="haaccount__hero-name">{session.name || 'Unnamed Member'}</span>
               <span className="haaccount__hero-email">{session.email}</span>
+              {session.achievement && (
+                <span className="haaccount__hero-achievement">{session.achievement}</span>
+              )}
+              {session.stravaUrl && (
+                <a
+                  className="haaccount__hero-strava"
+                  href={session.stravaUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Strava · {stravaHandle(session.stravaUrl)}
+                </a>
+              )}
               {session.hybridProfile && (
                 <span className="haaccount__hero-tag">
                   Hybrid Profile · <em>{session.hybridProfile}</em>
