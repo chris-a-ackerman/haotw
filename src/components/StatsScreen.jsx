@@ -89,8 +89,10 @@ function StatsScreen() {
   }, [setSearchParams]);
 
   const viewCertificate = React.useCallback((entry) => {
-    navigate(`/certificate/${entry.determinationNumber}`, { state: { from: 'stats' } });
-  }, [navigate]);
+    navigate(`/certificate/${entry.determinationNumber}`, {
+      state: { from: 'stats', profile: selectedHybridName || undefined },
+    });
+  }, [navigate, selectedHybridName]);
 
   React.useEffect(() => {
     let cancelled = false;

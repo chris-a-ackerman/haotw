@@ -103,7 +103,11 @@ function CertificateScreen() {
   }
 
   const entry = findByNumber(rows, number);
-  const from = location.state?.from === 'stats' ? '/stats' : '/archive';
+  let from = '/archive';
+  if (location.state?.from === 'stats') {
+    const profile = location.state?.profile;
+    from = profile ? `/stats?profile=${encodeURIComponent(profile)}` : '/stats';
+  }
   return <ChromedCertificate entry={entry} returnTo={from} />;
 }
 
