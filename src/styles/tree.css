@@ -1,0 +1,633 @@
+/* TreeScreen — The Coaching Tree. Indented relational register. */
+
+.hatree {
+  width: 100%;
+  max-width: var(--app-col-max);
+  min-height: 100vh;
+  background: var(--paper);
+  color: var(--ink);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 1px 0 0 rgba(0,0,0,0.04), -1px 0 0 rgba(0,0,0,0.04);
+  margin: 0 auto;
+  padding-bottom: 48px;
+}
+
+/* ---------- masthead --------------------------------------------- */
+.hatree__masthead {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 16px var(--app-pad-x) 8px;
+  gap: 8px;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: var(--paper);
+  border-bottom: 1px solid var(--ink);
+}
+.hatree__back {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 9.5px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  justify-self: start;
+  transition: color var(--dur-quick) var(--ease-doc);
+}
+.hatree__back:hover { color: var(--baa-blue); }
+.hatree__back-arrow {
+  font-family: var(--font-serif);
+  font-size: 14px;
+  letter-spacing: 0;
+}
+.hatree__wordmark-text {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--ink);
+  justify-self: center;
+}
+.hatree__folio-r {
+  justify-self: end;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 9.5px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+/* ---------- title block ------------------------------------------ */
+.hatree__header {
+  padding: 22px var(--app-pad-x) 14px;
+}
+.hatree__overline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--baa-blue);
+}
+.hatree__overline-tick {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--baa-yellow);
+  -webkit-text-stroke: 0.5px var(--ink);
+  paint-order: stroke fill;
+}
+.hatree__title {
+  margin: 8px 0 0;
+  font-family: var(--font-sans);
+  font-weight: 800;
+  font-size: 30px;
+  line-height: 1.0;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--baa-blue);
+}
+.hatree__subtitle {
+  margin: 8px 0 0;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--ink-3);
+}
+.hatree__meta-row {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.20em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+.hatree__meta-dot { color: var(--ink-3); }
+
+.hatree__rule { border: 0; margin: 0; }
+.hatree__rule--banner {
+  border-top: 2px solid var(--ink);
+  margin: 6px 0 0;
+}
+
+/* ---------- TSRC group bracket ----------------------------------- */
+.hatree__group {
+  margin: 18px var(--app-pad-x) 8px;
+  padding: 12px 12px 8px;
+  border-left: 2px solid var(--baa-blue);
+  position: relative;
+}
+.hatree__group::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -2px;
+  width: 12px;
+  height: 2px;
+  background: var(--baa-blue);
+}
+.hatree__group::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: -2px;
+  width: 12px;
+  height: 2px;
+  background: var(--baa-blue);
+}
+.hatree__group-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 9.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--baa-blue);
+  margin: 0 0 8px;
+  padding: 4px 8px;
+  background: var(--baa-blue-tint);
+  border-radius: 1px;
+}
+
+/* ---------- list / rows ------------------------------------------ */
+.hatree__list {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0 var(--app-pad-x);
+}
+.hatree__list--grouped {
+  padding: 0;
+  margin: 4px 0 0;
+}
+.hatree__node { list-style: none; }
+.hatree__root { list-style: none; }
+.hatree__children {
+  list-style: none;
+  margin: 0;
+  padding-left: calc(20px);
+  position: relative;
+}
+.hatree__children::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 4px;
+  bottom: 14px;
+  border-left: 0.5px dotted var(--rule-soft);
+}
+.hatree__children--root::before { display: none; }
+.hatree__children--root { padding-left: 0; }
+
+.hatree__row {
+  --depth: 0;
+  position: relative;
+  margin: 8px 0 0;
+  padding: 0;
+  border-radius: 1px;
+}
+.hatree__row-tap {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 8px;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 36px 1fr;
+  gap: 12px;
+  align-items: start;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  border-radius: 2px;
+  transition: background var(--dur-quick) var(--ease-doc);
+}
+.hatree__row-tap:hover { background: var(--baa-blue-tint); }
+.hatree__row-tap:active { transform: translateY(0.5px); }
+
+.hatree__row-portrait { flex-shrink: 0; }
+.hatree__row-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.hatree__row-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.hatree__row-name {
+  font-family: var(--font-serif);
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--ink);
+  line-height: 1.25;
+}
+.hatree__row--nonmember .hatree__row-name { color: var(--ink-2); font-style: italic; }
+.hatree__row-tag {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 8.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  border: 0.5px solid var(--rule-soft);
+  padding: 1px 5px;
+  border-radius: 1px;
+}
+
+/* ---------- chips (Distinctions) --------------------------------- */
+.hatree__chips {
+  list-style: none;
+  margin: 2px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 5px;
+}
+.hatree__chip {
+  appearance: none;
+  border: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  background: var(--chip-color, var(--baa-blue));
+  color: #fff;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 8.5px;
+  letter-spacing: 0.20em;
+  text-transform: uppercase;
+  border-radius: 1px;
+  transition: opacity var(--dur-quick) var(--ease-doc);
+}
+.hatree__chip:hover { opacity: 0.86; }
+.hatree__chip-icon {
+  font-size: 10px;
+  letter-spacing: 0;
+}
+.hatree__chip-text { white-space: nowrap; }
+
+.hatree__brought {
+  margin: 4px 0 0;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--ink-3);
+  line-height: 1.4;
+}
+.hatree__brought em {
+  font-style: normal;
+  color: var(--ink-2);
+}
+
+.hatree__lateral-label {
+  margin-top: 6px;
+  display: inline-block;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 8.5px;
+  letter-spacing: 0.20em;
+  text-transform: uppercase;
+  color: var(--baa-blue);
+  padding-left: 12px;
+  background-image: linear-gradient(to right, var(--baa-blue) 30%, transparent 30%);
+  background-size: 6px 1px;
+  background-repeat: repeat-x;
+  background-position: left center;
+}
+
+/* ---------- chevron ---------------------------------------------- */
+.hatree__chev {
+  appearance: none;
+  background: transparent;
+  border: 0.5px solid var(--rule-soft);
+  border-radius: 1px;
+  padding: 3px 6px;
+  margin: 2px 0 0 56px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 9px;
+  letter-spacing: 0.20em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  transition: background var(--dur-quick) var(--ease-doc), color var(--dur-quick) var(--ease-doc);
+}
+.hatree__chev:hover { background: var(--baa-blue-tint); color: var(--baa-blue); }
+.hatree__chev-icon {
+  font-family: var(--font-serif);
+  font-size: 12px;
+  letter-spacing: 0;
+}
+.hatree__chev-count {
+  font-family: var(--font-sans);
+}
+
+/* ---------- non-member inline tile ------------------------------- */
+.hatree__tile {
+  margin: 6px 8px 8px 56px;
+  padding: 14px;
+  background: var(--paper-2);
+  border: 0.5px solid var(--rule-soft);
+  border-left: 2px solid var(--baa-blue);
+  border-radius: 1px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  animation: hatree-tile 0.24s var(--ease-doc) both;
+}
+@keyframes hatree-tile {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.hatree__tile-head {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: 12px;
+  align-items: center;
+}
+.hatree__tile-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.hatree__tile-overline {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.hatree__tile-name {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-style: italic;
+  font-size: 22px;
+  color: var(--ink);
+  line-height: 1.05;
+}
+.hatree__tile-sub {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+.hatree__tile-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 6px;
+  border-top: 0.5px solid var(--rule-soft);
+}
+.hatree__tile-section-label {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 9.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+.hatree__tile-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.hatree__tile-link {
+  font-family: var(--font-serif);
+  font-size: 14px;
+  color: var(--baa-blue);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.hatree__tile-link:hover { text-decoration: underline; }
+
+/* ---------- distinction popover ---------------------------------- */
+.hatree__popover {
+  position: fixed;
+  z-index: 150;
+  width: 260px;
+  background: var(--paper);
+  border: 1px solid var(--ink);
+  border-radius: 1px;
+  padding: 14px;
+  box-shadow: var(--shadow-card);
+  animation: hatree-popover 0.18s var(--ease-doc) both;
+}
+@keyframes hatree-popover {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.hatree__popover-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.hatree__popover-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  background: var(--chip-color, var(--baa-blue));
+  color: #fff;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 8.5px;
+  letter-spacing: 0.20em;
+  text-transform: uppercase;
+  border-radius: 1px;
+}
+.hatree__popover-close {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  font-family: var(--font-display);
+  font-size: 20px;
+  color: var(--ink-3);
+  cursor: pointer;
+  line-height: 1;
+  padding: 0 2px;
+}
+.hatree__popover-close:hover { color: var(--ink); }
+.hatree__popover-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-style: italic;
+  font-size: 16px;
+  color: var(--ink);
+  line-height: 1.15;
+}
+.hatree__popover-desc {
+  margin: 6px 0 6px;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 12px;
+  color: var(--ink-2);
+  line-height: 1.4;
+}
+.hatree__popover-list {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+  max-height: 220px;
+  overflow-y: auto;
+}
+.hatree__popover-row {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 24px 1fr auto;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 4px;
+  border-top: 0.5px solid var(--rule-soft);
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  transition: background var(--dur-quick) var(--ease-doc);
+}
+.hatree__popover-row:hover { background: var(--baa-blue-tint); }
+.hatree__popover-name {
+  font-family: var(--font-serif);
+  font-size: 14px;
+  color: var(--ink);
+}
+.hatree__popover-tag {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 8px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-right: 4px;
+}
+.hatree__popover-arrow {
+  font-family: var(--font-serif);
+  font-size: 14px;
+  color: var(--baa-blue);
+}
+.hatree__popover-empty {
+  font-family: var(--font-serif);
+  font-style: italic;
+  color: var(--ink-3);
+  font-size: 13px;
+  padding: 8px 4px;
+}
+
+/* ---------- loading / error state -------------------------------- */
+.hatree__state {
+  padding: 32px var(--app-pad-x);
+  font-family: var(--font-serif);
+  font-style: italic;
+  color: var(--ink-3);
+  font-size: 15px;
+}
+
+.hatree__foot {
+  margin: 32px var(--app-pad-x) 12px;
+  padding-top: 12px;
+  border-top: 0.5px solid var(--rule-soft);
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+/* ---------- entrance animations ---------------------------------- */
+@keyframes hatree-rise {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes hatree-draw {
+  from { opacity: 0; transform: scaleX(0); }
+  to   { opacity: 1; transform: scaleX(1); }
+}
+.hatree__rise {
+  opacity: 0;
+  animation: hatree-rise 0.6s var(--ease-doc) both;
+}
+.hatree__draw {
+  opacity: 0;
+  transform-origin: left center;
+  animation: hatree-draw 0.7s var(--ease-doc) both;
+}
+
+/* ---------- Avatar (shared component) ---------------------------- */
+.haavatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--paper-2);
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 600;
+  color: var(--ink-2);
+  overflow: hidden;
+  flex-shrink: 0;
+  position: relative;
+}
+.haavatar__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.haavatar__initials {
+  position: relative;
+  top: 0;
+  letter-spacing: 0.02em;
+}
+.haavatar--plain {
+  border: 0.5px solid var(--rule-soft);
+}
+.haavatar--member {
+  border: 1.5px solid var(--baa-blue);
+}
+.haavatar--nonmember {
+  border: 1.5px solid var(--rule-soft);
+  filter: saturate(0.92);
+}

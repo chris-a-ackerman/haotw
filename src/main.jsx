@@ -13,6 +13,9 @@ import './styles/auth.css';
 import './styles/claim.css';
 import './styles/account.css';
 import './styles/hybridProfile.css';
+import './styles/tree.css';
+import './styles/lineage.css';
+import './styles/registrar.css';
 import './styles/app.css';
 
 import App from './App.jsx';

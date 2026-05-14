@@ -333,3 +333,53 @@
   .haprofile__rule { margin: 0 18px; }
   .haprofile__scroll { padding: 16px 18px 22px; }
 }
+
+/* Cross-link to the Coaching Tree (inserted between hero and wins list). */
+.haprofile__tree-link {
+  display: grid;
+  grid-template-columns: 22px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  margin: 14px 0 18px;
+  background: var(--baa-blue-tint);
+  border: 0.5px solid var(--baa-blue);
+  border-radius: 1px;
+  color: var(--ink);
+  text-decoration: none;
+  transition: background var(--dur-quick) var(--ease-doc);
+}
+.haprofile__tree-link:hover { background: #d8e3f4; }
+.haprofile__tree-link-mark {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 16px;
+  color: var(--baa-blue);
+  text-align: center;
+}
+.haprofile__tree-link-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.haprofile__tree-link-l {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--baa-blue);
+}
+.haprofile__tree-link-meta {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 12.5px;
+  color: var(--ink-2);
+}
+.haprofile__tree-link-arrow {
+  font-family: var(--font-serif);
+  font-size: 16px;
+  color: var(--baa-blue);
+}

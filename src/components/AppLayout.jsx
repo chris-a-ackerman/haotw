@@ -13,7 +13,9 @@ const NAV_ITEMS_BASE = [
   { id: 'archive', path: '/archive', label: 'Official Record',      numeral: 'II' },
   { id: 'stats',   path: '/stats',   label: 'Hybrids',               numeral: 'III'},
 ];
-const NAV_ITEM_CROWN = { id: 'crown', path: '/issue', label: 'Issue Determination', numeral: 'IV' };
+const NAV_ITEM_CROWN = { id: 'crown', path: '/issue',       label: 'Issue Determination',     numeral: 'IV' };
+const NAV_ITEM_TREE  = { id: 'tree',  path: '/tree',        label: 'Coaching Tree',           numeral: 'V'  };
+const NAV_ITEM_ADMIN = { id: 'admin', path: '/tree/admin',  label: 'Office of the Registrar', numeral: 'VI' };
 
 function HamburgerButton({ onOpen }) {
   return (
@@ -31,8 +33,16 @@ function HamburgerButton({ onOpen }) {
   );
 }
 
-function HamburgerDrawer({ open, onClose, isChampion, session, onSignOut, onOpenAccount }) {
-  const items = isChampion ? [...NAV_ITEMS_BASE, NAV_ITEM_CROWN] : NAV_ITEMS_BASE;
+function HamburgerDrawer({ open, onClose, isChampion, isAdmin, session, onSignOut, onOpenAccount }) {
+  // Numeral order: I/II/III base, IV champion crown (conditional), V coaching
+  // tree (always), VI registrar (conditional). Insert IV before V so the
+  // numbering reads cleanly when both conditionals are present.
+  const items = [
+    ...NAV_ITEMS_BASE,
+    ...(isChampion ? [NAV_ITEM_CROWN] : []),
+    NAV_ITEM_TREE,
+    ...(isAdmin ? [NAV_ITEM_ADMIN] : []),
+  ];
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -138,7 +148,7 @@ function HamburgerDrawer({ open, onClose, isChampion, session, onSignOut, onOpen
 }
 
 function AppLayout() {
-  const { session, isChampion, onSignOut, setSession, onClaimed } = useAppContext();
+  const { session, isChampion, isAdmin, onSignOut, setSession, onClaimed } = useAppContext();
   const [menuOpen, setMenuOpen] = React.useState(false);
   const [accountOpen, setAccountOpen] = React.useState(false);
 
@@ -152,6 +162,7 @@ function AppLayout() {
         open={menuOpen}
         onClose={() => setMenuOpen(false)}
         isChampion={isChampion}
+        isAdmin={isAdmin}
         session={session}
         onSignOut={onSignOut}
         onOpenAccount={() => setAccountOpen(true)}

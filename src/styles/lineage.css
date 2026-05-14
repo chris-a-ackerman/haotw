@@ -1,0 +1,387 @@
+/* LineageScreen — /tree/:slug. The provenance view for a single person. */
+
+.halineage {
+  width: 100%;
+  max-width: var(--app-col-max);
+  min-height: 100vh;
+  background: var(--paper);
+  color: var(--ink);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 1px 0 0 rgba(0,0,0,0.04), -1px 0 0 rgba(0,0,0,0.04);
+  margin: 0 auto;
+  padding-bottom: 48px;
+}
+
+/* ---------- masthead --------------------------------------------- */
+.halineage__masthead {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 16px var(--app-pad-x) 8px;
+  gap: 8px;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: var(--paper);
+  border-bottom: 1px solid var(--ink);
+}
+.halineage__back {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 9.5px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  justify-self: start;
+  transition: color var(--dur-quick) var(--ease-doc);
+}
+.halineage__back:hover { color: var(--baa-blue); }
+.halineage__back-arrow {
+  font-family: var(--font-serif);
+  font-size: 14px;
+}
+.halineage__wordmark-text {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--ink);
+  justify-self: center;
+}
+.halineage__folio-r {
+  justify-self: end;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 9.5px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+/* ---------- title block ------------------------------------------ */
+.halineage__header {
+  padding: 22px var(--app-pad-x) 14px;
+}
+.halineage__overline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--baa-blue);
+}
+.halineage__overline-tick {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--baa-yellow);
+  -webkit-text-stroke: 0.5px var(--ink);
+  paint-order: stroke fill;
+}
+.halineage__title {
+  margin: 8px 0 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-style: italic;
+  font-size: 30px;
+  line-height: 1.1;
+  letter-spacing: -0.005em;
+  color: var(--ink);
+}
+.halineage__subtitle {
+  margin: 8px 0 0;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--ink-3);
+}
+
+.halineage__rule {
+  border: 0;
+  margin: 0;
+}
+.halineage__rule--banner {
+  border-top: 2px solid var(--ink);
+  margin: 6px 0 0;
+}
+
+/* ---------- sections --------------------------------------------- */
+.halineage__section {
+  padding: 20px var(--app-pad-x) 8px;
+  border-bottom: 0.5px solid var(--rule-soft);
+}
+.halineage__section-title {
+  margin: 0 0 12px;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 10.5px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--baa-blue);
+}
+
+/* ---------- card (used in Upstream + Downstream + Lateral) ------- */
+.halineage__card {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: start;
+  gap: 12px;
+  padding: 10px 8px;
+  border-radius: 1px;
+  text-decoration: none;
+  color: inherit;
+}
+.halineage__card--link {
+  cursor: pointer;
+  transition: background var(--dur-quick) var(--ease-doc);
+}
+.halineage__card--link:hover { background: var(--baa-blue-tint); }
+.halineage__card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.halineage__card-caption {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.halineage__card-name {
+  font-family: var(--font-serif);
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--ink);
+  line-height: 1.25;
+}
+.halineage__card-meta {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 12.5px;
+  color: var(--ink-2);
+}
+.halineage__card-arrow {
+  font-family: var(--font-serif);
+  font-size: 16px;
+  color: var(--baa-blue);
+  align-self: center;
+}
+
+/* ---------- chips ------------------------------------------------ */
+.halineage__chips {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 5px;
+}
+.halineage__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  background: var(--chip-color, var(--baa-blue));
+  color: #fff;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 8.5px;
+  letter-spacing: 0.20em;
+  text-transform: uppercase;
+  border-radius: 1px;
+}
+
+/* ---------- hero (The Hybrid Profile) ---------------------------- */
+.halineage__hero {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  gap: 14px;
+  align-items: center;
+  padding: 4px 0 8px;
+}
+.halineage__hero-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.halineage__hero-overline {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 9.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--baa-blue);
+}
+.halineage__hero-name {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-style: italic;
+  font-size: 26px;
+  color: var(--ink);
+  line-height: 1.05;
+}
+.halineage__profile-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--baa-blue);
+  text-decoration: none;
+}
+.halineage__profile-link:hover { color: var(--baa-blue-ink); text-decoration: underline; }
+
+/* ---------- downstream ------------------------------------------- */
+.halineage__downstream-summary {
+  margin: 0 0 6px;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 13.5px;
+  color: var(--ink-2);
+}
+.halineage__downstream {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.halineage__downstream-row {
+  display: flex;
+  flex-direction: column;
+  border-top: 0.5px solid var(--rule-soft);
+}
+.halineage__downstream-row:first-child { border-top: 0; }
+.halineage__downstream-more {
+  align-self: flex-start;
+  margin: 0 0 6px 56px;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 9.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--baa-blue);
+  text-decoration: none;
+}
+.halineage__downstream-more:hover { text-decoration: underline; }
+
+/* ---------- lateral ---------------------------------------------- */
+.halineage__lateral {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.halineage__lateral-note {
+  margin: 0 0 12px;
+  font-family: var(--font-serif);
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--ink);
+}
+.halineage__lateral-note em {
+  font-style: italic;
+  color: var(--baa-blue);
+}
+.halineage__lateral-note strong {
+  font-weight: 600;
+  font-style: italic;
+}
+.halineage__lateral-quiet {
+  font-style: italic;
+  color: var(--ink-3);
+}
+
+/* ---------- footer ----------------------------------------------- */
+.halineage__foot {
+  margin: 32px var(--app-pad-x) 12px;
+  padding-top: 12px;
+  border-top: 0.5px solid var(--rule-soft);
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.halineage__state {
+  padding: 32px var(--app-pad-x);
+  font-family: var(--font-serif);
+  font-style: italic;
+  color: var(--ink-3);
+  font-size: 15px;
+}
+
+.halineage__notfound {
+  padding: 40px var(--app-pad-x);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.halineage__notfound-name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-style: italic;
+  font-size: 24px;
+  color: var(--ink);
+}
+.halineage__notfound-body {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-style: italic;
+  color: var(--ink-2);
+  font-size: 15px;
+}
+.halineage__notfound-link {
+  margin-top: 8px;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--baa-blue);
+  text-decoration: none;
+}
+.halineage__notfound-link:hover { text-decoration: underline; }
+
+/* ---------- entrance animations ---------------------------------- */
+@keyframes halineage-rise {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes halineage-draw {
+  from { opacity: 0; transform: scaleX(0); }
+  to   { opacity: 1; transform: scaleX(1); }
+}
+.halineage__rise {
+  opacity: 0;
+  animation: halineage-rise 0.6s var(--ease-doc) both;
+}
+.halineage__draw {
+  opacity: 0;
+  transform-origin: left center;
+  animation: halineage-draw 0.7s var(--ease-doc) both;
+}

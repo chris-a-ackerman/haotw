@@ -53,6 +53,7 @@ function sessionFromUser(user, profile) {
     hybridProfile: profile && profile.hybrid_profile,
     stravaUrl:   (profile && profile.strava_url)  || meta.strava_url  || null,
     achievement: (profile && profile.achievement) || meta.achievement || null,
+    isAdmin:     !!(profile && profile.is_admin),
   };
 }
 
@@ -63,7 +64,7 @@ async function fetchProfile(userId) {
   // recoverable; hanging the auth gate is not.
   const query = supabase
     .from('profiles')
-    .select('name, photo_url, hybrid_profile, strava_url, achievement')
+    .select('name, photo_url, hybrid_profile, strava_url, achievement, is_admin')
     .eq('user_id', userId)
     .maybeSingle();
   let timer;

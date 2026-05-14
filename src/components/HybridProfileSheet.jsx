@@ -8,7 +8,9 @@
 // the same payload flow as RecordScreen's "View & Share Certificate" CTA.
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { listProfilesWithPhotos } from '../lib/claims.js';
+import { slugify } from '../lib/certificate.js';
 
 const ROMAN_NUMERALS = [
   '', 'I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV',
@@ -134,6 +136,20 @@ function HybridProfileSheet({ open, hybridName, determinations, onClose, onViewC
                 )}
               </div>
             </div>
+
+            <Link
+              to={`/tree/${slugify(hybridName)}`}
+              state={{ from: 'stats' }}
+              className="haprofile__tree-link"
+              onClick={onClose}
+            >
+              <span className="haprofile__tree-link-mark" aria-hidden="true">§</span>
+              <span className="haprofile__tree-link-body">
+                <span className="haprofile__tree-link-l">Inscribed in the Coaching Tree</span>
+                <span className="haprofile__tree-link-meta">View lineage — provenance, recruits, lateral connections.</span>
+              </span>
+              <span className="haprofile__tree-link-arrow" aria-hidden="true">→</span>
+            </Link>
 
             <span className="haprofile__section-overline">
               Determinations on the Record
