@@ -12,7 +12,14 @@ function formatShort(date) {
   return date.toLocaleString('en-US', { month: 'short', day: 'numeric' });
 }
 
-function Row({ m, i }) {
+function Row({ m, i, onSelect }) {
+  const select = () => onSelect && onSelect(m.name);
+  const onKey = (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      select();
+    }
+  };
   return (
     <motion.tr
       className="hastat__row"
@@ -23,6 +30,11 @@ function Row({ m, i }) {
         duration: 0.42,
         ease: [0.2, 0.0, 0.0, 1.0],
       }}
+      role="button"
+      tabIndex={0}
+      onClick={select}
+      onKeyDown={onKey}
+      aria-label={`Open profile for ${m.name}`}
     >
       <td className="hastat__name">{m.name}</td>
       <td className={'hastat__wins' + (m.wins === 0 ? ' hastat__wins--zero' : '')}>
@@ -52,7 +64,7 @@ function Rise({ delay, children, as = 'div', className = '', ...rest }) {
   );
 }
 
-function StatsScreen() {
+function StatsScreen({ onSelectHybrid }) {
   const [stats, setStats] = React.useState(null);
 
   React.useEffect(() => {
@@ -142,7 +154,7 @@ function StatsScreen() {
               </thead>
               <tbody>
                 {members.map((m, i) => (
-                  <Row key={`${m.name}-${i}`} m={m} i={i} />
+                  <Row key={`${m.name}-${i}`} m={m} i={i} onSelect={onSelectHybrid} />
                 ))}
               </tbody>
             </table>

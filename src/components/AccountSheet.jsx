@@ -48,6 +48,11 @@ function ParticularsPanel({ session, onUpdated }) {
     setAchievement(session.achievement || '');
   }, [session.name, session.email, session.stravaUrl, session.achievement]);
 
+  const emailChanging = (email || '').trim().toLowerCase() !==
+                        (session.email || '').trim().toLowerCase();
+  const passwordChanging = !!newPassword;
+  const needsCurrentPassword = emailChanging || passwordChanging;
+
   const dirty =
     (name || '').trim()        !== (session.name        || '').trim() ||
     (email || '').trim()       !== (session.email       || '').trim() ||
@@ -72,8 +77,8 @@ function ParticularsPanel({ session, onUpdated }) {
       setError('Strava link must be a full URL.');
       return;
     }
-    if (!currentPassword) {
-      setError('Confirm your current passphrase to file changes.');
+    if (needsCurrentPassword && !currentPassword) {
+      setError('Confirm your current passphrase to change email or passphrase.');
       return;
     }
     setBusy(true);
@@ -82,7 +87,7 @@ function ParticularsPanel({ session, onUpdated }) {
       name: name.trim(),
       email: email.trim(),
       password: newPassword || undefined,
-      currentPassword,
+      currentPassword: needsCurrentPassword ? currentPassword : undefined,
       stravaUrl: strava,
       achievement: achievement.trim(),
     });
@@ -178,21 +183,23 @@ function ParticularsPanel({ session, onUpdated }) {
         />
       </div>
 
-      <div className="haaccount__field">
-        <label className="haaccount__label" htmlFor="acct-curpass">
-          <span>Current Passphrase</span>
-          <span className="haaccount__label-hint">required to file changes</span>
-        </label>
-        <input
-          id="acct-curpass"
-          type="password"
-          autoComplete="current-password"
-          className={'haaccount__input' + (error && /passphrase/i.test(error) ? ' is-error' : '')}
-          value={currentPassword}
-          onChange={(e) => { setCurrent(e.target.value); setError(null); setFiled(null); }}
-          placeholder="••••••••"
-        />
-      </div>
+      {needsCurrentPassword && (
+        <div className="haaccount__field">
+          <label className="haaccount__label" htmlFor="acct-curpass">
+            <span>Current Passphrase</span>
+            <span className="haaccount__label-hint">required to change email or passphrase</span>
+          </label>
+          <input
+            id="acct-curpass"
+            type="password"
+            autoComplete="current-password"
+            className={'haaccount__input' + (error && /passphrase/i.test(error) ? ' is-error' : '')}
+            value={currentPassword}
+            onChange={(e) => { setCurrent(e.target.value); setError(null); setFiled(null); }}
+            placeholder="••••••••"
+          />
+        </div>
+      )}
 
       {error && <span className="haaccount__error">{error}</span>}
       {filed && <span className="haaccount__filed">{filed}</span>}

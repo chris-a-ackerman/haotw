@@ -49,3 +49,23 @@ export function slugify(s) {
     .replace(/^-|-$/g, '')
     .toLowerCase();
 }
+
+// Shape a determination row → the payload the certificate view expects.
+// Used by RecordScreen's "View & Share Certificate" CTA and by the Hybrid
+// Profile panel's wins list.
+export function buildCertPayload(entry) {
+  const coDetermination = (entry.winners || []).length > 1;
+  return {
+    data: {
+      org:        'Hybrid Athletes',
+      title:      coDetermination ? 'Hybrid Athletes of the Week' : 'Hybrid Athlete of the Week',
+      weekLabel:  `No. ${entry.determinationNumber} · ${entry.determinedOn}`,
+      determinationNumber: entry.determinationNumber,
+      recipients: entry.winners,
+      body:       entry.citation,
+      determinedBy: entry.determiner,
+      est:        'Est. 2023',
+    },
+    speech: entry.speech,
+  };
+}

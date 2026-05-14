@@ -14,8 +14,10 @@ import NoticeScreen from './components/NoticeScreen.jsx';
 import ClaimScreen from './components/ClaimScreen.jsx';
 import AuthScreen from './components/AuthScreen.jsx';
 import AccountSheet from './components/AccountSheet.jsx';
+import HybridProfileSheet from './components/HybridProfileSheet.jsx';
 import { CertificateShare } from './components/Certificate.jsx';
 import AdminBackfill from './components/AdminBackfill.jsx';
+import { buildCertPayload } from './lib/certificate.js';
 
 const HREF_TO_VIEW = {
   'index.html':       'home',
@@ -204,7 +206,14 @@ function App() {
   const [session, setSession] = React.useState(null);
   const [recoveryMode, setRecoveryMode] = React.useState(false);
   const [certPayload, setCertPayload] = React.useState(null);
+  // Which view the certificate was launched from — used to route the Return
+  // link back to the originating screen ('archive' or 'stats').
+  const [certReturnView, setCertReturnView] = React.useState('archive');
   const [determinations, setDeterminations] = React.useState([]);
+  // Tracks which hybrid's profile panel is open from the Stats screen. We
+  // intentionally do NOT clear this on navigation to 'certificate', so the
+  // panel re-opens automatically when the user returns to Stats.
+  const [selectedHybridName, setSelectedHybridName] = React.useState(null);
   // Lets a signed-in user without a hybrid_profile claim still reach the rest
   // of the app — used either when ClaimScreen's roster fetch fails or when
   // the user simply wants to defer. Resets on sign-in / sign-out so they're
@@ -268,6 +277,7 @@ function App() {
     await Auth.signOut();
     setRecoveryMode(false);
     setClaimSkipped(false);
+    setSelectedHybridName(null);
     setSession(null);
   }, []);
 
@@ -296,6 +306,15 @@ function App() {
     setView(next);
     requestAnimationFrame(() => window.scrollTo(0, 0));
   }, []);
+
+  // Shape a determination row into the certificate payload and route to the
+  // certificate view. Shared by RecordScreen and the Hybrid Profile panel.
+  // `source` is the view the user came from so Return can route back to it.
+  const viewCertificate = React.useCallback((entry, source = 'archive') => {
+    setCertPayload(buildCertPayload(entry));
+    setCertReturnView(source);
+    navigate('certificate');
+  }, [navigate]);
 
   React.useEffect(() => {
     const onClick = (e) => {
@@ -334,27 +353,9 @@ function App() {
   let screen = null;
   if (view === 'home')         screen = <HomeScreen isChampion={isChampion} determination={latestDetermination} determinationNo={determinations.length} />;
   else if (view === 'archive') screen = (
-    <RecordScreen
-      onViewCertificate={(entry) => {
-        const folioLabel = `No. ${entry.determinationNumber} · ${entry.determinedOn}`;
-        setCertPayload({
-          data: {
-            org:        'Hybrid Athletes',
-            title:      entry.winners.length > 1 ? 'Hybrid Athletes of the Week' : 'Hybrid Athlete of the Week',
-            weekLabel:  folioLabel,
-            determinationNumber: entry.determinationNumber,
-            recipients: entry.winners,
-            body:       entry.citation,
-            determinedBy: entry.determiner,
-            est:        'Est. 2023',
-          },
-          speech: entry.speech,
-        });
-        navigate('certificate');
-      }}
-    />
+    <RecordScreen onViewCertificate={viewCertificate} />
   );
-  else if (view === 'stats')   screen = <StatsScreen />;
+  else if (view === 'stats')   screen = <StatsScreen onSelectHybrid={setSelectedHybridName} />;
   else if (view === 'crown')   screen = <IssueScreen issuer={session} />;
   else if (view === 'certificate' && standalone) {
     if (!latestDetermination) {
@@ -403,7 +404,12 @@ function App() {
           </div>
           <hr className="hahome__rule hahome__rule--top" />
           <div className="hahome__folio" style={{ paddingTop: 6 }}>
-            <a href={certPayload ? "record.html" : "index.html"} className="haissue__back">
+            <a
+              href={certPayload
+                ? (certReturnView === 'stats' ? 'stats.html' : 'record.html')
+                : 'index.html'}
+              className="haissue__back"
+            >
               <span className="haissue__back-arrow" aria-hidden="true">←</span>
               <span>Return</span>
             </a>
@@ -450,6 +456,14 @@ function App() {
         onClose={() => setAccountOpen(false)}
         onSessionChange={(next) => setSession(next)}
         onClaim={(profile) => onClaimed(profile)}
+      />
+
+      <HybridProfileSheet
+        open={view === 'stats' && !accountOpen && !!selectedHybridName}
+        hybridName={selectedHybridName}
+        determinations={determinations}
+        onClose={() => setSelectedHybridName(null)}
+        onViewCertificate={(entry) => viewCertificate(entry, 'stats')}
       />
 
       <ExitConfirmModal

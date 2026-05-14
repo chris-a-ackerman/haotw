@@ -1,0 +1,335 @@
+/* HybridProfileSheet — read-only drawer that opens from the Stats
+   leaderboard. Mirrors the AccountSheet shell (account.css) but with
+   its own prefix and a slightly higher stacking layer so the two
+   drawers can coexist without colliding. */
+
+/* ---------- clickable stats rows ----------------------------------- */
+.hastat__row {
+  cursor: pointer;
+  transition: background var(--dur-quick) var(--ease-doc);
+}
+.hastat__row:hover {
+  background: var(--baa-blue-tint);
+}
+.hastat__row:hover .hastat__name {
+  color: var(--baa-blue);
+}
+.hastat__row:focus-visible {
+  outline: 1px solid var(--baa-blue);
+  outline-offset: -1px;
+}
+
+/* ---------- scrim + sheet ------------------------------------------ */
+.haprofile__scrim {
+  position: fixed;
+  inset: 0;
+  background: rgba(26, 26, 26, 0.52);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur-base) var(--ease-doc);
+  z-index: 122;
+}
+.haprofile__scrim.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.haprofile {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(96vw, 460px);
+  background: var(--paper);
+  border-left: 1px solid var(--ink);
+  z-index: 132;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.36s var(--ease-doc);
+  box-shadow: -10px 0 0 rgba(0,0,0,0.04);
+}
+.haprofile.is-open { transform: translateX(0); }
+
+.haprofile__banner {
+  height: 3px;
+  background: var(--baa-blue);
+  position: relative;
+  flex: 0 0 auto;
+}
+.haprofile__banner::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; top: 5px;
+  border-top: 0.5px solid var(--baa-blue);
+}
+
+.haprofile__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px 12px;
+  flex: 0 0 auto;
+}
+.haprofile__office {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.haprofile__close {
+  appearance: none;
+  background: transparent;
+  border: 1px solid var(--ink);
+  border-radius: 1px;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: 22px;
+  line-height: 1;
+  color: var(--ink);
+  padding: 0 0 2px;
+  transition: background var(--dur-quick) var(--ease-doc);
+}
+.haprofile__close:hover { background: var(--baa-blue-tint); }
+
+.haprofile__rule {
+  border: 0;
+  border-top: 1px solid var(--ink);
+  margin: 0 24px;
+  flex: 0 0 auto;
+}
+
+.haprofile__scroll {
+  overflow-y: auto;
+  padding: 18px 24px 24px;
+  flex: 1 1 auto;
+}
+
+/* ---------- hero / hybrid identity -------------------------------- */
+.haprofile__hero {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  padding: 6px 0 18px;
+  border-bottom: 0.5px solid var(--rule-soft);
+  margin-bottom: 22px;
+}
+.haprofile__hero-disc {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--paper-2);
+  border: 0.5px solid var(--rule-soft);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 600;
+  font-size: 24px;
+  color: var(--ink-2);
+  flex: 0 0 auto;
+}
+.haprofile__hero-disc img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.haprofile__hero-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.haprofile__hero-overline {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 9px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.haprofile__hero-name {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 22px;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  line-height: 1.1;
+}
+.haprofile__hero-achievement {
+  margin-top: 6px;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--ink-2);
+  text-wrap: pretty;
+}
+.haprofile__hero-strava {
+  margin-top: 6px;
+  align-self: flex-start;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 9.5px;
+  letter-spacing: 0.20em;
+  text-transform: uppercase;
+  color: var(--baa-blue);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 0.5px;
+  transition: color var(--dur-quick) var(--ease-doc);
+}
+.haprofile__hero-strava:hover { color: var(--baa-blue-ink); }
+.haprofile__hero-tag {
+  margin-top: 6px;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 9.5px;
+  letter-spacing: 0.20em;
+  text-transform: uppercase;
+  color: var(--baa-blue);
+}
+.haprofile__hero-tag--unclaimed { color: var(--status-warn); }
+
+/* ---------- section heading -------------------------------------- */
+.haprofile__section-overline {
+  display: block;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 0 0 12px;
+}
+
+.haprofile__empty {
+  margin: 0;
+  padding: 16px 8px;
+  font-family: var(--font-serif);
+  font-style: italic;
+  color: var(--ink-3);
+  text-align: center;
+  border-top: 0.5px solid var(--rule-soft);
+  border-bottom: 0.5px solid var(--rule-soft);
+}
+
+/* ---------- wins list -------------------------------------------- */
+.haprofile__wins {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 0.5px solid var(--rule-soft);
+}
+.haprofile__wins-item {
+  border-bottom: 0.5px solid var(--rule-soft);
+}
+.haprofile__wins-row {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 12px 6px;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 36px 1fr 18px;
+  gap: 12px;
+  align-items: baseline;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  transition: background var(--dur-quick) var(--ease-doc);
+}
+.haprofile__wins-row:hover { background: var(--baa-blue-tint); }
+.haprofile__wins-row:focus-visible {
+  outline: 1px solid var(--baa-blue);
+  outline-offset: -1px;
+}
+.haprofile__wins-numeral {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 600;
+  font-size: 16px;
+  letter-spacing: 0;
+  color: var(--baa-blue);
+  text-align: center;
+}
+.haprofile__wins-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.haprofile__wins-head {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  flex-wrap: wrap;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 9.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.haprofile__wins-no { color: var(--ink-2); }
+.haprofile__wins-dot { color: var(--ink-3); }
+.haprofile__wins-date { color: var(--ink-3); }
+.haprofile__wins-co {
+  display: inline-block;
+  background: var(--baa-yellow);
+  color: var(--ink);
+  padding: 2px 6px;
+  font-size: 8.5px;
+  letter-spacing: 0.22em;
+  border-radius: 1px;
+}
+.haprofile__wins-names {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 17px;
+  letter-spacing: -0.005em;
+  color: var(--ink);
+  line-height: 1.2;
+}
+.haprofile__wins-row:hover .haprofile__wins-names { color: var(--baa-blue); }
+.haprofile__wins-arrow {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--ink-3);
+  align-self: center;
+  transition: transform var(--dur-quick) var(--ease-doc),
+              color var(--dur-quick) var(--ease-doc);
+}
+.haprofile__wins-row:hover .haprofile__wins-arrow {
+  color: var(--baa-blue);
+  transform: translateX(2px);
+}
+
+/* ---------- foot ------------------------------------------------- */
+.haprofile__foot {
+  margin-top: 22px;
+  padding-top: 12px;
+  border-top: 0.5px solid var(--rule-soft);
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 8.5px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+@media (max-width: 440px) {
+  .haprofile { width: 100vw; border-left: 0; }
+  .haprofile__head { padding: 16px 18px 10px; }
+  .haprofile__rule { margin: 0 18px; }
+  .haprofile__scroll { padding: 16px 18px 22px; }
+}

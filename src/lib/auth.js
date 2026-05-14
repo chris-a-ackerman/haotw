@@ -271,8 +271,13 @@ export async function updateUser({ oldEmail, name, email, password, currentPassw
     const isLocalUser = !!user;
 
     if (isLocalUser) {
-      if (currentPassword == null || user.password !== currentPassword) {
-        return { ok: false, error: 'Current passphrase does not match.' };
+      const emailChanging =
+        (email || '').toLowerCase() !== (oldEmail || '').toLowerCase();
+      const passwordChanging = !!password;
+      if (emailChanging || passwordChanging) {
+        if (currentPassword == null || user.password !== currentPassword) {
+          return { ok: false, error: 'Current passphrase does not match.' };
+        }
       }
     }
     const nextEmail = (email || (user && user.email) || oldEmail || '').trim();
