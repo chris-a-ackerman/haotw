@@ -5,9 +5,11 @@
 // preserves the "Committee is deliberating" UX in both modes.
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { supabase, isLive } from '../lib/supabase.js';
 import { createDetermination, listDeterminations } from '../lib/records.js';
 import { listProfilesWithPhotos } from '../lib/claims.js';
+import { useAppContext } from '../context/AppContext.jsx';
 
 const ISSUE = {
   filedAt: 'Filed at Boston, Mass.',
@@ -138,7 +140,8 @@ function ConfirmModal({ open, recipients, awardNo, onConfirm, onCancel }) {
   );
 }
 
-function IssueScreen({ issuer }) {
+function IssueScreen() {
+  const { session: issuer } = useAppContext();
   const [selected, setSelected] = React.useState([]);
   const [speech, setSpeech] = React.useState('');
   const [genState, setGenState] = React.useState('idle');
@@ -274,10 +277,10 @@ function IssueScreen({ issuer }) {
         <hr className="hahome__rule hahome__rule--top hahome__draw" {...delay(180)} />
 
         <div className="hahome__folio hahome__rise" {...delay(280)}>
-          <a href="index.html" className="haissue__back" aria-label="Return to record">
+          <Link to="/" className="haissue__back" aria-label="Return to record">
             <span className="haissue__back-arrow" aria-hidden="true">←</span>
             Return
-          </a>
+          </Link>
           <span className="hahome__folio-c">Determination</span>
           <span>{new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
         </div>
@@ -471,14 +474,14 @@ function IssueScreen({ issuer }) {
             </p>
           )}
           {filed && (
-            <a
-              href="record.html"
+            <Link
+              to="/archive"
               className="haissue__btn haissue__btn--ghost haissue__btn--full haissue__btn--view-record"
             >
               <span className="haissue__btn-numeral" aria-hidden="true">§</span>
               <span>View in Official Record</span>
               <span className="haissue__btn-arrow" aria-hidden="true">→</span>
-            </a>
+            </Link>
           )}
         </section>
 

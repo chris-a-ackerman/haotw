@@ -3,7 +3,9 @@
 // Entrance: CSS-driven fade-up, staggered with custom-property delays.
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Certificate } from './Certificate.jsx';
+import { useAppContext } from '../context/AppContext.jsx';
 
 const delay = (n) => ({ style: { animationDelay: `${n}ms` } });
 
@@ -18,7 +20,9 @@ function formatFiledDate(value) {
   return value;
 }
 
-function HomeScreen({ isChampion = false, determination, determinationNo }) {
+function HomeScreen() {
+  const { isChampion, latestDetermination: determination, determinations } = useAppContext();
+  const determinationNo = determinations.length;
   if (!determination) {
     return (
       <div className="hahome">
@@ -70,10 +74,10 @@ function HomeScreen({ isChampion = false, determination, determinationNo }) {
       </header>
 
       <main className="hahome__main">
-        <a href="record.html" className="hahome__weekbadge hahome__weekbadge--link hahome__rise" {...delay(440)}>
+        <Link to="/archive" className="hahome__weekbadge hahome__weekbadge--link hahome__rise" {...delay(440)}>
           <span>Official Record</span>
           <span className="hahome__weekbadge-arrow" aria-hidden="true">→</span>
-        </a>
+        </Link>
 
         <div className="hahome__inre hahome__rise" {...delay(580)}>Current HAOTW</div>
 
@@ -87,8 +91,8 @@ function HomeScreen({ isChampion = false, determination, determinationNo }) {
           <span>{determination.determinedOn}</span>
         </div>
 
-        <a
-          href="/?view=certificate"
+        <Link
+          to="/certificate"
           target="_blank"
           rel="noopener noreferrer"
           className="hahome__cert-link"
@@ -108,7 +112,7 @@ function HomeScreen({ isChampion = false, determination, determinationNo }) {
               Issued under seal by The Committee &middot; affixed for public viewing
             </figcaption>
           </figure>
-        </a>
+        </Link>
 
         <hr className="hahome__rule hahome__rule--soft hahome__draw" {...delay(1000)} />
 
@@ -120,10 +124,10 @@ function HomeScreen({ isChampion = false, determination, determinationNo }) {
         </div>
 
         {isChampion && (
-          <a href="issue.html" className="hahome__issue hahome__rise" {...delay(1620)}>
+          <Link to="/issue" className="hahome__issue hahome__rise" {...delay(1620)}>
             <span className="hahome__issue-label">Choose the next HAOTW</span>
             <span className="hahome__issue-arrow" aria-hidden="true">→</span>
-          </a>
+          </Link>
         )}
       </main>
 

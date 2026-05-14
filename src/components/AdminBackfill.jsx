@@ -6,14 +6,14 @@
 // same capturePng + uploadCertificate path the live cert flow uses, so
 // historical PNGs render identically to ones produced at file-time.
 //
-// Delete after backfill: this file, the HREF_TO_VIEW entry in App.jsx, and
-// the view-rendering branch.
+// Delete after backfill: this file and its /admin/backfill route entry in App.jsx.
 
 import React from 'react';
 import { createPortal } from 'react-dom';
 import { Certificate } from './Certificate.jsx';
 import { capturePng, uploadCertificate, slugify } from '../lib/certificate.js';
 import { supabase, isLive } from '../lib/supabase.js';
+import { useAppContext } from '../context/AppContext.jsx';
 
 const ADMIN_EMAILS = ['chris.ackerman02@gmail.com'];
 
@@ -61,7 +61,8 @@ function certDataFor(row) {
   };
 }
 
-export default function AdminBackfill({ session }) {
+export default function AdminBackfill() {
+  const { session } = useAppContext();
   const [log, setLog] = React.useState([]);
   const [running, setRunning] = React.useState(false);
   const [current, setCurrent] = React.useState(null);

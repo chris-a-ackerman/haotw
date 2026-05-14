@@ -3,7 +3,9 @@
 // Entrance: CSS-driven, re-keyed on state change so it replays.
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { listDeterminations } from '../lib/records.js';
+import { useAppContext } from '../context/AppContext.jsx';
 
 const NOTICE_DATA = {
   champion: { name: 'Theodore J. Clifford', short: 'Mr. T. J. Clifford' },
@@ -161,10 +163,10 @@ function Letter({ daysKey, isChampion, number }) {
 
       {isChampion ? (
         <div className="hahome__rise" style={{ animationDelay: '520ms' }}>
-          <a href="issue.html" className="hanotice__cta">
+          <Link to="/issue" className="hanotice__cta">
             <span>Issue Determination</span>
             <span className="hanotice__cta-arrow" aria-hidden="true">→</span>
-          </a>
+          </Link>
         </div>
       ) : (
         <div className="hahome__rise hanotice__await" style={{ animationDelay: '520ms' }}>
@@ -192,7 +194,8 @@ function Letter({ daysKey, isChampion, number }) {
   );
 }
 
-function NoticeScreen({ isChampion = true }) {
+function NoticeScreen() {
+  const { isChampion } = useAppContext();
   const [days, setDays] = React.useState(1);
   const [pendingDeterminationNumber, setPendingDeterminationNumber] = React.useState(null);
 
