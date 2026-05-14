@@ -4,6 +4,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { loadStats } from '../lib/stats.js';
+import { listProfilesWithPhotos } from '../lib/claims.js';
 
 function formatLong(date) {
   return date.toLocaleString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
@@ -12,7 +13,15 @@ function formatShort(date) {
   return date.toLocaleString('en-US', { month: 'short', day: 'numeric' });
 }
 
-function Row({ m, i }) {
+function Row({ m, i, photoUrl, onSelect }) {
+  const select = () => onSelect && onSelect(m.name);
+  const onKey = (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      select();
+    }
+  };
+  const initial = (m.name || '·')[0].toUpperCase();
   return (
     <motion.tr
       className="hastat__row"
@@ -23,7 +32,19 @@ function Row({ m, i }) {
         duration: 0.42,
         ease: [0.2, 0.0, 0.0, 1.0],
       }}
+      role="button"
+      tabIndex={0}
+      onClick={select}
+      onKeyDown={onKey}
+      aria-label={`Open profile for ${m.name}`}
     >
+      <td className="hastat__avatar-cell">
+        <span className="hastat__avatar" aria-hidden="true">
+          {photoUrl
+            ? <img src={photoUrl} alt="" />
+            : <span>{initial}</span>}
+        </span>
+      </td>
       <td className="hastat__name">{m.name}</td>
       <td className={'hastat__wins' + (m.wins === 0 ? ' hastat__wins--zero' : '')}>
         {m.wins}
@@ -52,14 +73,21 @@ function Rise({ delay, children, as = 'div', className = '', ...rest }) {
   );
 }
 
-function StatsScreen() {
+function StatsScreen({ onSelectHybrid }) {
   const [stats, setStats] = React.useState(null);
+  const [photoByName, setPhotoByName] = React.useState(() => new Map());
 
   React.useEffect(() => {
     let cancelled = false;
     loadStats()
       .then((s) => { if (!cancelled) setStats(s); })
       .catch((err) => { console.warn('loadStats failed', err); });
+    listProfilesWithPhotos()
+      .then((rows) => {
+        if (cancelled) return;
+        setPhotoByName(new Map((rows || []).map(r => [r.name, r.photoUrl || null])));
+      })
+      .catch((err) => { console.warn('listProfilesWithPhotos failed', err); });
     return () => { cancelled = true; };
   }, []);
 
@@ -135,6 +163,7 @@ function StatsScreen() {
             <table className="hastat__table">
               <thead className="hastat__thead">
                 <tr>
+                  <th className="col-avatar" scope="col" aria-label="Portrait"></th>
                   <th className="col-name" scope="col">Name</th>
                   <th className="col-wins" scope="col">Wins</th>
                   <th className="col-last" scope="col">Last Crowned</th>
@@ -142,7 +171,13 @@ function StatsScreen() {
               </thead>
               <tbody>
                 {members.map((m, i) => (
-                  <Row key={`${m.name}-${i}`} m={m} i={i} />
+                  <Row
+                    key={`${m.name}-${i}`}
+                    m={m}
+                    i={i}
+                    photoUrl={photoByName.get(m.name) || null}
+                    onSelect={onSelectHybrid}
+                  />
                 ))}
               </tbody>
             </table>

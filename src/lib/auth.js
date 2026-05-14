@@ -16,7 +16,7 @@
 //   onAuthStateChange(cb)                 -> {unsubscribe}  (sync)
 //
 // Session shape (mirrors original prototype, plus user_id when live):
-//   { email, name, photo, hybridProfile?, provider?, user_id? }
+//   { email, name, photo, hybridProfile?, stravaUrl?, achievement?, provider?, user_id? }
 
 import { supabase, isLive } from './supabase.js';
 
@@ -51,6 +51,8 @@ function sessionFromUser(user, profile) {
     photo:   (profile && profile.photo_url) || meta.photo || meta.avatar_url || null,
     provider: user.app_metadata && user.app_metadata.provider,
     hybridProfile: profile && profile.hybrid_profile,
+    stravaUrl:   (profile && profile.strava_url)  || meta.strava_url  || null,
+    achievement: (profile && profile.achievement) || meta.achievement || null,
   };
 }
 
@@ -61,7 +63,7 @@ async function fetchProfile(userId) {
   // recoverable; hanging the auth gate is not.
   const query = supabase
     .from('profiles')
-    .select('name, photo_url, hybrid_profile')
+    .select('name, photo_url, hybrid_profile, strava_url, achievement')
     .eq('user_id', userId)
     .maybeSingle();
   let timer;
@@ -104,7 +106,13 @@ export async function signIn({ email, password }) {
     if (!u || u.password !== password) {
       return { ok: false, error: 'Email or password not on file.' };
     }
-    const session = { email: u.email, name: u.name, photo: u.photo };
+    const session = {
+      email: u.email,
+      name: u.name,
+      photo: u.photo,
+      stravaUrl: u.stravaUrl || null,
+      achievement: u.achievement || null,
+    };
     saveSessionLocal(session);
     return { ok: true, session };
   }
@@ -114,23 +122,45 @@ export async function signIn({ email, password }) {
   return { ok: true, session: sessionFromUser(data.user, profile) };
 }
 
-export async function signUp({ name, email, password, photo }) {
+export async function signUp({ name, email, password, photo, stravaUrl, achievement }) {
+  const strava = (stravaUrl || '').trim() || null;
+  const achieve = (achievement || '').trim() || null;
   if (!isLive()) {
     const users = loadUsersLocal();
     if (users.some(x => x.email.toLowerCase() === email.toLowerCase())) {
       return { ok: false, error: 'An account with that email already exists.' };
     }
-    const user = { name, email, password, photo: photo || null };
+    const user = {
+      name,
+      email,
+      password,
+      photo: photo || null,
+      stravaUrl: strava,
+      achievement: achieve,
+    };
     users.push(user);
     saveUsersLocal(users);
-    const session = { email, name, photo: photo || null };
+    const session = {
+      email,
+      name,
+      photo: photo || null,
+      stravaUrl: strava,
+      achievement: achieve,
+    };
     saveSessionLocal(session);
     return { ok: true, session };
   }
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: { data: { name, photo: photo || null } },
+    options: {
+      data: {
+        name,
+        photo: photo || null,
+        strava_url: strava,
+        achievement: achieve,
+      },
+    },
   });
   if (error) {
     const msg = /already registered|already exists/i.test(error.message)
@@ -139,7 +169,12 @@ export async function signUp({ name, email, password, photo }) {
     return { ok: false, error: msg };
   }
   if (data.user) {
-    await upsertProfile(data.user.id, { name, photo_url: photo || null });
+    await upsertProfile(data.user.id, {
+      name,
+      photo_url: photo || null,
+      strava_url: strava,
+      achievement: achieve,
+    });
   }
   const profile = await fetchProfile(data.user && data.user.id);
   return { ok: true, session: sessionFromUser(data.user, profile) };
@@ -182,6 +217,8 @@ export async function completePasswordReset({ email, password }) {
       email: users[idx].email,
       name:  users[idx].name,
       photo: users[idx].photo,
+      stravaUrl:   users[idx].stravaUrl   || null,
+      achievement: users[idx].achievement || null,
     };
     saveSessionLocal(session);
     return { ok: true, session };
@@ -219,7 +256,12 @@ export async function signOut() {
   await supabase.auth.signOut();
 }
 
-export async function updateUser({ oldEmail, name, email, password, currentPassword }) {
+export async function updateUser({ oldEmail, name, email, password, currentPassword, stravaUrl, achievement }) {
+  const stravaProvided = stravaUrl !== undefined;
+  const achieveProvided = achievement !== undefined;
+  const strava  = stravaProvided  ? ((stravaUrl  || '').trim() || null) : undefined;
+  const achieve = achieveProvided ? ((achievement || '').trim() || null) : undefined;
+
   if (!isLive()) {
     const users = loadUsersLocal();
     const idx = users.findIndex(
@@ -229,8 +271,13 @@ export async function updateUser({ oldEmail, name, email, password, currentPassw
     const isLocalUser = !!user;
 
     if (isLocalUser) {
-      if (currentPassword == null || user.password !== currentPassword) {
-        return { ok: false, error: 'Current passphrase does not match.' };
+      const emailChanging =
+        (email || '').toLowerCase() !== (oldEmail || '').toLowerCase();
+      const passwordChanging = !!password;
+      if (emailChanging || passwordChanging) {
+        if (currentPassword == null || user.password !== currentPassword) {
+          return { ok: false, error: 'Current passphrase does not match.' };
+        }
       }
     }
     const nextEmail = (email || (user && user.email) || oldEmail || '').trim();
@@ -245,13 +292,22 @@ export async function updateUser({ oldEmail, name, email, password, currentPassw
       email:    nextEmail,
       password: password || (user ? user.password : ''),
       photo:    user ? user.photo : null,
+      stravaUrl:   stravaProvided  ? strava  : (user ? (user.stravaUrl   || null) : null),
+      achievement: achieveProvided ? achieve : (user ? (user.achievement || null) : null),
     };
     if (isLocalUser) users[idx] = nextUser;
     else users.push(nextUser);
     saveUsersLocal(users);
 
     const prev = loadSessionLocal() || {};
-    const session = { ...prev, name: nextUser.name, email: nextUser.email, photo: nextUser.photo };
+    const session = {
+      ...prev,
+      name: nextUser.name,
+      email: nextUser.email,
+      photo: nextUser.photo,
+      stravaUrl: nextUser.stravaUrl,
+      achievement: nextUser.achievement,
+    };
     saveSessionLocal(session);
     return { ok: true, session };
   }
@@ -274,8 +330,14 @@ export async function updateUser({ oldEmail, name, email, password, currentPassw
       : error.message;
     return { ok: false, error: msg };
   }
-  if (data.user && name != null) {
-    await upsertProfile(data.user.id, { name });
+  if (data.user) {
+    const patch = {};
+    if (name != null)      patch.name        = name;
+    if (stravaProvided)    patch.strava_url  = strava;
+    if (achieveProvided)   patch.achievement = achieve;
+    if (Object.keys(patch).length) {
+      await upsertProfile(data.user.id, patch);
+    }
   }
   const profile = await fetchProfile(data.user && data.user.id);
   return { ok: true, session: sessionFromUser(data.user, profile) };

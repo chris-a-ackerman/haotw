@@ -6,6 +6,15 @@ import * as Auth from '../lib/auth.js';
 
 const HAOTW_PASSCODE = 'HAOTW';
 
+function isValidUrl(v) {
+  try {
+    const u = new URL(v);
+    return u.protocol === 'http:' || u.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
 function AuthMasthead({ folio }) {
   return (
     <>
@@ -274,12 +283,14 @@ function PasscodePanel({ onPass, onBack }) {
 }
 
 function SignUpPanel({ onAuthed, onBack }) {
-  const [name, setName]         = React.useState('');
-  const [email, setEmail]       = React.useState('');
-  const [password, setPassword] = React.useState('');
-  const [photo, setPhoto]       = React.useState(null);
-  const [error, setError]       = React.useState(null);
-  const [busy, setBusy]         = React.useState(false);
+  const [name, setName]               = React.useState('');
+  const [email, setEmail]             = React.useState('');
+  const [password, setPassword]       = React.useState('');
+  const [photo, setPhoto]             = React.useState(null);
+  const [stravaUrl, setStravaUrl]     = React.useState('');
+  const [achievement, setAchievement] = React.useState('');
+  const [error, setError]             = React.useState(null);
+  const [busy, setBusy]               = React.useState(false);
   const fileRef = React.useRef(null);
 
   const onPhoto = (file) => {
@@ -299,12 +310,19 @@ function SignUpPanel({ onAuthed, onBack }) {
       setError('Passphrase must be at least 6 characters.');
       return;
     }
+    const strava = stravaUrl.trim();
+    if (strava && !isValidUrl(strava)) {
+      setError('Strava link must be a full URL.');
+      return;
+    }
     setBusy(true);
     const r = await Auth.signUp({
       name: name.trim(),
       email: email.trim(),
       password,
       photo,
+      stravaUrl: strava,
+      achievement: achievement.trim(),
     });
     setBusy(false);
     if (!r.ok) { setError(r.error); return; }
@@ -407,6 +425,39 @@ function SignUpPanel({ onAuthed, onBack }) {
               onChange={(e) => onPhoto(e.target.files && e.target.files[0])}
             />
           </div>
+        </div>
+
+        <div className="haauth__field">
+          <label className="haauth__label" htmlFor="su-strava">
+            <span>Strava Particulars</span>
+            <span className="haauth__label-hint">optional</span>
+          </label>
+          <input
+            id="su-strava"
+            type="url"
+            inputMode="url"
+            autoComplete="url"
+            className={'haauth__input' + (error && /strava/i.test(error) ? ' is-error' : '')}
+            value={stravaUrl}
+            onChange={(e) => { setStravaUrl(e.target.value); setError(null); }}
+            placeholder="https://www.strava.com/athletes/…"
+          />
+        </div>
+
+        <div className="haauth__field">
+          <label className="haauth__label" htmlFor="su-achievement">
+            <span>Achievement of Note</span>
+            <span className="haauth__label-hint">optional</span>
+          </label>
+          <input
+            id="su-achievement"
+            type="text"
+            maxLength={140}
+            className="haauth__input"
+            value={achievement}
+            onChange={(e) => { setAchievement(e.target.value); setError(null); }}
+            placeholder="Boston Marathon, sub-3 hours"
+          />
         </div>
 
         {error && <span className="haauth__error">{error}</span>}
