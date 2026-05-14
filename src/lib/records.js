@@ -2,7 +2,7 @@
 // the same dataset that the original RecordScreen.jsx held inline, so the
 // app ships the demo content even before any Supabase row exists.
 
-import { supabase, isLive } from './supabase.js';
+import { supabase, isLive, logSupabaseError } from './supabase.js';
 
 const STORAGE_RECORDS = 'haotw.records';
 
@@ -150,7 +150,7 @@ export async function listDeterminations() {
     .select('*')
     .order('determination_number', { ascending: false });
   if (error) {
-    console.warn('listDeterminations failed', error);
+    logSupabaseError('listDeterminations failed', error);
     return [];
   }
   return data.map(fromRow);

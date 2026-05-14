@@ -205,6 +205,11 @@ function App() {
   const [recoveryMode, setRecoveryMode] = React.useState(false);
   const [certPayload, setCertPayload] = React.useState(null);
   const [determinations, setDeterminations] = React.useState([]);
+  // Lets a signed-in user without a hybrid_profile claim still reach the rest
+  // of the app — used either when ClaimScreen's roster fetch fails or when
+  // the user simply wants to defer. Resets on sign-in / sign-out so they're
+  // nudged to claim each fresh session.
+  const [claimSkipped, setClaimSkipped] = React.useState(false);
 
   const refreshDeterminations = React.useCallback(async () => {
     try {
@@ -241,6 +246,7 @@ function App() {
 
   const onAuthed = React.useCallback((s) => {
     setRecoveryMode(false);
+    setClaimSkipped(false);
     setSession(s);
     setView('home');
     requestAnimationFrame(() => window.scrollTo(0, 0));
@@ -248,12 +254,20 @@ function App() {
 
   const onClaimed = React.useCallback((profile) => {
     setSession((prev) => prev ? { ...prev, hybridProfile: profile } : prev);
+    setClaimSkipped(false);
+    requestAnimationFrame(() => window.scrollTo(0, 0));
+  }, []);
+
+  const onSkipClaim = React.useCallback(() => {
+    setClaimSkipped(true);
+    setView('home');
     requestAnimationFrame(() => window.scrollTo(0, 0));
   }, []);
 
   const onSignOut = React.useCallback(async () => {
     await Auth.signOut();
     setRecoveryMode(false);
+    setClaimSkipped(false);
     setSession(null);
   }, []);
 
@@ -312,8 +326,8 @@ function App() {
   if (!session) {
     return <AuthScreen onAuthed={onAuthed} />;
   }
-  if (!session.hybridProfile) {
-    return <ClaimScreen session={session} onClaimed={onClaimed} />;
+  if (!session.hybridProfile && !claimSkipped) {
+    return <ClaimScreen session={session} onClaimed={onClaimed} onSkip={onSkipClaim} />;
   }
 
   // Render
