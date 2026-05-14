@@ -9,13 +9,19 @@
 // dashed connector with a tracked-caps annotation.
 //
 // Interaction:
-//   - Tap a member row → /tree/:slug
-//   - Tap a non-member row → expands a NonMemberTile inline (one open at a time)
-//   - Tap a distinction chip → opens a popover listing bearers
-//   - Tap the chevron on a row with deeper recruits → expand/collapse subtree
+//   - Tap any row with children → toggle that node's subtree inline
+//   - Tap a leaf row (no children) → no-op (row is non-interactive)
+//   - Tap a distinction chip → opens a popover listing bearers; picking a
+//     bearer toggles their subtree (same as a row tap)
+//   - Tap the chevron on a row with children → expand/collapse subtree
+//   - Expand-all toolbar → bulk expand or collapse every subtree at once
+//
+// Children for tree-render purposes are the union of 'parent' and 'recruited'
+// outbound edges, so a mother (non-member) seats above her first member in
+// the indented view rather than only inside a side panel.
 
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext.jsx';
 import Avatar from './Avatar.jsx';
 
@@ -90,58 +96,60 @@ function TreeRow({
   expanded,
   onToggle,
   onChipClick,
-  onMemberTap,
-  onNonMemberTap,
-  isOpenTile,
+  onTap,
   lateralLabel,
 }) {
   const variant = person.isMember ? 'member' : 'nonmember';
-  const isClickable = true;
+  // Leaves have nothing to expand — keep them inert so clicks don't no-op.
+  const isClickable = hasChildren;
 
-  const handleClick = () => {
-    if (person.isMember) onMemberTap(person);
-    else onNonMemberTap(person);
-  };
+  const body = (
+    <>
+      <Avatar
+        name={person.displayName}
+        photoUrl={person.photoUrl}
+        size={36}
+        variant={variant}
+        className="hatree__row-portrait"
+      />
+      <div className="hatree__row-body">
+        <div className="hatree__row-head">
+          <span className="hatree__row-name">{person.displayName}</span>
+          {!person.isMember
+            ? <span className="hatree__row-tag">Non-member</span>
+            : null}
+        </div>
+        <ChipList distinctions={person.distinctions} onChipClick={onChipClick} />
+        <BroughtLine parent={parent} recruiter={recruiter} />
+        {lateralLabel ? <div className="hatree__lateral-label">{lateralLabel}</div> : null}
+      </div>
+    </>
+  );
 
   return (
     <div
       className={
         'hatree__row' +
-        (person.isMember ? ' hatree__row--member' : ' hatree__row--nonmember') +
-        (isOpenTile ? ' is-tile-open' : '')
+        (person.isMember ? ' hatree__row--member' : ' hatree__row--nonmember')
       }
       style={{ '--depth': depth }}
     >
       <div className="hatree__row-rule" aria-hidden="true" />
-      <button
-        type="button"
-        className="hatree__row-tap"
-        onClick={handleClick}
-        aria-label={
-          person.isMember
-            ? `View lineage of ${person.displayName}`
-            : `Open details for ${person.displayName}`
-        }
-      >
-        <Avatar
-          name={person.displayName}
-          photoUrl={person.photoUrl}
-          size={36}
-          variant={variant}
-          className="hatree__row-portrait"
-        />
-        <div className="hatree__row-body">
-          <div className="hatree__row-head">
-            <span className="hatree__row-name">{person.displayName}</span>
-            {!person.isMember
-              ? <span className="hatree__row-tag">Non-member</span>
-              : null}
-          </div>
-          <ChipList distinctions={person.distinctions} onChipClick={onChipClick} />
-          <BroughtLine parent={parent} recruiter={recruiter} />
-          {lateralLabel ? <div className="hatree__lateral-label">{lateralLabel}</div> : null}
+      {isClickable ? (
+        <button
+          type="button"
+          className="hatree__row-tap"
+          onClick={() => onTap(person)}
+          aria-expanded={expanded}
+          aria-label={`Toggle recruits of ${person.displayName}`}
+        >
+          {body}
+        </button>
+      ) : (
+        <div className="hatree__row-tap hatree__row-tap--inert">
+          {body}
         </div>
-      </button>
+      )}
       {hasChildren ? (
         <ChevronToggle open={expanded} count={childCount} onClick={onToggle} />
       ) : null}
@@ -149,64 +157,7 @@ function TreeRow({
   );
 }
 
-function NonMemberTile({ person, parentChildrenByPersonId, disciplesByPersonId, peopleById }) {
-  const children = parentChildrenByPersonId.get(person.id) || [];
-  const disciples = disciplesByPersonId.get(person.id) || [];
-  const inTsrc = (person.distinctions || []).some((d) => d.name === TSRC_NAME);
-  return (
-    <div className="hatree__tile">
-      <div className="hatree__tile-head">
-        <Avatar
-          name={person.displayName}
-          photoUrl={person.photoUrl}
-          size={64}
-          variant="nonmember"
-        />
-        <div className="hatree__tile-meta">
-          <span className="hatree__tile-overline">Non-member · Inscribed in the Tree</span>
-          <span className="hatree__tile-name">{person.displayName}</span>
-          <span className="hatree__tile-sub">
-            {inTsrc
-              ? 'Member of Troubled Soles Run Club — Franklin, MA.'
-              : children.length === 1
-                ? `Mother of ${children[0].displayName}.`
-                : 'Inscribed in the Tree.'}
-          </span>
-        </div>
-      </div>
-      {children.length > 0 ? (
-        <div className="hatree__tile-section">
-          <span className="hatree__tile-section-label">Mother of</span>
-          <ul className="hatree__tile-list">
-            {children.map((c) => (
-              <li key={c.id}>
-                <Link to={`/tree/${c.slug}`} state={{ from: 'tree' }} className="hatree__tile-link">
-                  {c.displayName} <span aria-hidden="true">→</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ) : null}
-      {disciples.length > 0 ? (
-        <div className="hatree__tile-section">
-          <span className="hatree__tile-section-label">Disciples introduced to the Tree</span>
-          <ul className="hatree__tile-list">
-            {disciples.map((d) => (
-              <li key={d.id}>
-                <Link to={`/tree/${d.slug}`} state={{ from: 'tree' }} className="hatree__tile-link">
-                  {d.displayName} <span aria-hidden="true">→</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ) : null}
-    </div>
-  );
-}
-
-function DistinctionPopover({ anchor, distinction, peopleByDistinction, onClose, onPickMember, onPickNonMember }) {
+function DistinctionPopover({ anchor, distinction, peopleByDistinction, onClose, onPick }) {
   const popRef = React.useRef(null);
   const [pos, setPos] = React.useState({ top: 0, left: 0 });
 
@@ -276,8 +227,7 @@ function DistinctionPopover({ anchor, distinction, peopleByDistinction, onClose,
               className="hatree__popover-row"
               onClick={() => {
                 onClose();
-                if (p.isMember) onPickMember(p);
-                else onPickNonMember(p);
+                onPick(p);
               }}
             >
               <Avatar
@@ -306,10 +256,12 @@ function formatDate(iso) {
 
 function TreeScreen() {
   const { treeBundle, refreshTree } = useAppContext();
-  const navigate = useNavigate();
   const [loadingError, setLoadingError] = React.useState(false);
-  const [openTileId, setOpenTileId] = React.useState(null);
   const [collapsed, setCollapsed] = React.useState(() => new Set()); // person ids whose subtree is hidden
+  // Bulk override: when set, every node renders open ('expanded') or closed
+  // ('collapsed') regardless of `collapsed`. A user-driven chevron click bakes
+  // this bulk state back into `collapsed` and clears the override.
+  const [bulkMode, setBulkMode] = React.useState(null); // null | 'expanded' | 'collapsed'
   const [popover, setPopover] = React.useState(null); // { distinction, anchor }
 
   React.useEffect(() => {
@@ -385,6 +337,13 @@ function TreeScreen() {
       .map((r) => peopleById.get(r.toId))
       .filter(Boolean);
   }
+  // Children to render in the tree: both kinds count as "brought to the tree."
+  // Parent edges seat mothers above their first member; recruited edges chain
+  // members down the lineage. Order: parents first so the mother→member step
+  // reads cleanly before any sibling recruits.
+  function treeChildren(personId) {
+    return [...parentChildren(personId), ...recruitedChildren(personId)];
+  }
 
   // Roots: anyone with no inbound parent or recruited edge. Non-members
   // (mothers) and orphan members both qualify.
@@ -403,13 +362,6 @@ function TreeScreen() {
   );
   const tsrcRoots = roots.filter((p) => tsrcMemberIds.has(p.id));
   const otherRoots = roots.filter((p) => !tsrcMemberIds.has(p.id));
-
-  const parentChildrenByPersonId = new Map();
-  const disciplesByPersonId = new Map();
-  for (const p of people) {
-    parentChildrenByPersonId.set(p.id, parentChildren(p.id));
-    disciplesByPersonId.set(p.id, recruitedChildren(p.id));
-  }
 
   const peopleByDistinction = new Map();
   for (const d of distinctions) {
@@ -433,7 +385,42 @@ function TreeScreen() {
     }
   }
 
+  // Walks the tree from each root and produces a `collapsed` Set whose
+  // every-node `isOpen` matches the given bulk mode. Used to "freeze" the
+  // visual state when a user makes an individual chevron click while a bulk
+  // override is active, so they only see *that* node change.
+  function bakeBulkStateIntoCollapsed(mode) {
+    const result = new Set();
+    const wantOpen = mode === 'expanded';
+    function walk(personId, depth, visited) {
+      if (visited.has(personId)) return;
+      visited.add(personId);
+      const kids = treeChildren(personId);
+      if (kids.length > 0) {
+        const defaultOpen = depth < 2;
+        // isOpen = defaultOpen ? !has : has. To produce the desired isOpen:
+        //   wantOpen && defaultOpen   → not in set
+        //   wantOpen && !defaultOpen  → in set
+        //   !wantOpen && defaultOpen  → in set
+        //   !wantOpen && !defaultOpen → not in set
+        const inSet = wantOpen ? !defaultOpen : defaultOpen;
+        if (inSet) result.add(personId);
+      }
+      for (const c of kids) walk(c.id, depth + 1, visited);
+    }
+    for (const r of roots) walk(r.id, 0, new Set());
+    return result;
+  }
+
   function toggleBranch(personId) {
+    if (bulkMode !== null) {
+      const baked = bakeBulkStateIntoCollapsed(bulkMode);
+      if (baked.has(personId)) baked.delete(personId);
+      else baked.add(personId);
+      setCollapsed(baked);
+      setBulkMode(null);
+      return;
+    }
     setCollapsed((prev) => {
       const next = new Set(prev);
       if (next.has(personId)) next.delete(personId);
@@ -442,11 +429,10 @@ function TreeScreen() {
     });
   }
 
-  function onMemberTap(p) {
-    navigate(`/tree/${p.slug}`, { state: { from: 'tree' } });
-  }
-  function onNonMemberTap(p) {
-    setOpenTileId((prev) => (prev === p.id ? null : p.id));
+  function onRowTap(p) {
+    // Toggle the subtree inline if there's anything to expand. Leaf rows are
+    // gated upstream in TreeRow and never reach this handler.
+    if (treeChildren(p.id).length > 0) toggleBranch(p.id);
   }
 
   function renderSubtree(personId, depth, visited) {
@@ -454,13 +440,16 @@ function TreeScreen() {
     visited.add(personId);
     const person = peopleById.get(personId);
     if (!person) return null;
-    const children = recruitedChildren(personId);
+    const children = treeChildren(personId);
     // Default: first two levels expanded, deeper collapsed. The `collapsed`
     // Set tracks user-toggled overrides — for default-open rows, presence
     // means "user collapsed it"; for default-closed rows, presence means
     // "user expanded it." This lets one Set carry both directions of toggle.
     const defaultOpen = depth < 2;
-    const isOpen = defaultOpen ? !collapsed.has(personId) : collapsed.has(personId);
+    const isOpen =
+      bulkMode === 'expanded' ? true
+      : bulkMode === 'collapsed' ? false
+      : defaultOpen ? !collapsed.has(personId) : collapsed.has(personId);
 
     const parentEdges = inboundOfKind(personId, 'parent');
     const recruiterEdges = inboundOfKind(personId, 'recruited');
@@ -479,19 +468,9 @@ function TreeScreen() {
           expanded={isOpen}
           onToggle={() => toggleBranch(personId)}
           onChipClick={(d, anchor) => setPopover({ distinction: d, anchor })}
-          onMemberTap={onMemberTap}
-          onNonMemberTap={onNonMemberTap}
-          isOpenTile={openTileId === person.id}
+          onTap={onRowTap}
           lateralLabel={lateralAnnotations.get(person.id) || null}
         />
-        {openTileId === person.id && !person.isMember ? (
-          <NonMemberTile
-            person={person}
-            parentChildrenByPersonId={parentChildrenByPersonId}
-            disciplesByPersonId={disciplesByPersonId}
-            peopleById={peopleById}
-          />
-        ) : null}
         {children.length > 0 && isOpen ? (
           <ul className="hatree__children">
             {children.map((c) => renderSubtree(c.id, depth + 1, new Set(visited)))}
@@ -532,6 +511,17 @@ function TreeScreen() {
 
       <hr className="hatree__rule hatree__rule--banner hatree__draw" {...delay(420)} />
 
+      <div className="hatree__toolbar hatree__rise" {...delay(480)}>
+        <button
+          type="button"
+          className="hatree__expand-all"
+          onClick={() => setBulkMode((m) => (m === 'expanded' ? 'collapsed' : 'expanded'))}
+          aria-pressed={bulkMode === 'expanded'}
+        >
+          {bulkMode === 'expanded' ? 'Collapse all' : 'Expand all'}
+        </button>
+      </div>
+
       {tsrcRoots.length > 0 ? (
         <section className="hatree__group hatree__group--tsrc hatree__rise" {...delay(540)}>
           <header className="hatree__group-chip">
@@ -569,8 +559,7 @@ function TreeScreen() {
           distinction={popover.distinction}
           peopleByDistinction={peopleByDistinction}
           onClose={() => setPopover(null)}
-          onPickMember={onMemberTap}
-          onPickNonMember={(p) => setOpenTileId(p.id)}
+          onPick={onRowTap}
         />
       ) : null}
     </main>
