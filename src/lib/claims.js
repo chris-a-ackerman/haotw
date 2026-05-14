@@ -9,7 +9,7 @@
 //   transferEmail(o,n)  -> void   (no-op when live; auth handles email moves)
 //   reset()             -> void   (dev fallback; removes the localStorage key)
 
-import { supabase, isLive } from './supabase.js';
+import { supabase, isLive, logSupabaseError } from './supabase.js';
 import { setHybridProfile } from './auth.js';
 
 export const HYBRID_PROFILES = [
@@ -34,7 +34,7 @@ export async function listProfiles() {
     .select('display_name')
     .order('id', { ascending: true });
   if (error) {
-    console.warn('listProfiles failed, falling back to constant', error);
+    logSupabaseError('listProfiles failed, falling back to constant', error);
     return [...HYBRID_PROFILES];
   }
   return data.map(r => r.display_name);
@@ -67,7 +67,7 @@ export async function listProfilesWithPhotos() {
     supabase.from('profiles').select('user_id, photo_url'),
   ]);
   if (pErr || cErr || rErr) {
-    console.warn('listProfilesWithPhotos failed, falling back to constant',
+    logSupabaseError('listProfilesWithPhotos failed, falling back to constant',
       pErr || cErr || rErr);
     return HYBRID_PROFILES.map(name => ({ name, photoUrl: null }));
   }
@@ -87,10 +87,18 @@ export async function unclaimed() {
     return HYBRID_PROFILES.filter((p) => !c[p]);
   }
   // Anti-join: profiles minus those with a claim row.
-  const [{ data: profiles }, { data: claims }] = await Promise.all([
+  const [{ data: profiles, error: pErr },
+         { data: claims,   error: cErr }] = await Promise.all([
     supabase.from('hybrid_profiles').select('id, display_name').order('id'),
     supabase.from('profile_claims').select('hybrid_profile_id'),
   ]);
+  if (pErr || cErr) {
+    // Fall back to the full roster so the ClaimScreen can still render and the
+    // user can attempt a claim. Claims.claim() surfaces a PK conflict if they
+    // pick a name that's already taken.
+    logSupabaseError('unclaimed() failed, falling back to constant', pErr || cErr);
+    return [...HYBRID_PROFILES];
+  }
   const claimed = new Set((claims || []).map(r => r.hybrid_profile_id));
   return (profiles || [])
     .filter(p => !claimed.has(p.id))

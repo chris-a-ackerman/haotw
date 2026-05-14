@@ -269,7 +269,7 @@ function ConfirmedPanel({ name }) {
   );
 }
 
-function ClaimScreen({ session, onClaimed }) {
+function ClaimScreen({ session, onClaimed, onSkip }) {
   const [unclaimedList, setUnclaimed] = React.useState([]);
   const [suggested, setSuggested] = React.useState(null);
   const [step, setStep] = React.useState('match');
@@ -280,14 +280,24 @@ function ClaimScreen({ session, onClaimed }) {
 
   React.useEffect(() => {
     let cancelled = false;
-    Claims.unclaimed().then((list) => {
-      if (cancelled) return;
-      setUnclaimed(list);
-      const m = Claims.match(session && session.name, list);
-      setSuggested(m);
-      setStep(m ? 'match' : 'browse');
-      setLoaded(true);
-    });
+    Claims.unclaimed()
+      .then((list) => {
+        if (cancelled) return;
+        setUnclaimed(list);
+        const m = Claims.match(session && session.name, list);
+        setSuggested(m);
+        setStep(m ? 'match' : 'browse');
+        setLoaded(true);
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        // Defensive: Claims.unclaimed() itself falls back on internal errors,
+        // but anything unexpected should not strand the user on a blank screen.
+        console.warn('ClaimScreen: unclaimed() rejected', err);
+        setUnclaimed([...HYBRID_PROFILES]);
+        setStep('browse');
+        setLoaded(true);
+      });
     return () => { cancelled = true; };
   }, [session && session.name]);
 
@@ -348,6 +358,19 @@ function ClaimScreen({ session, onClaimed }) {
 
       {step === 'confirmed' && (
         <ConfirmedPanel name={claimedName} />
+      )}
+
+      {loaded && step !== 'confirmed' && onSkip && (
+        <div className="haclaim__defer-wrap">
+          <button
+            type="button"
+            className="haclaim__defer"
+            onClick={onSkip}
+            disabled={busy}
+          >
+            Proceed without designation
+          </button>
+        </div>
       )}
 
       <div className="haclaim__colophon">

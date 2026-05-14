@@ -532,6 +532,29 @@
   to { transform: rotate(360deg); }
 }
 
+/* ---------- defer-claim link --------------------------------------- */
+.haclaim__defer-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 8px 24px 18px;
+}
+.haclaim__defer {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 4px 8px;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 11.5px;
+  color: var(--ink-3);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--rule-soft);
+  transition: color var(--dur-quick) var(--ease-doc);
+}
+.haclaim__defer:hover { color: var(--baa-blue); }
+
 /* ---------- colophon ----------------------------------------------- */
 .haclaim__colophon {
   margin-top: auto;
