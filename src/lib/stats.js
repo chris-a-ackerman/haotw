@@ -63,22 +63,27 @@ function rankMembers(members) {
     .map(({ _lastCrownedDate, ...rest }) => rest);
 }
 
-export async function loadStats() {
-  const [profiles, determinations] = await Promise.all([
-    listProfiles(),
-    listDeterminations(),
-  ]);
-
-  const memberRows = profiles.map((name) => computeMember(name, determinations));
+// Pure aggregation. Pass already-loaded data (from AppContext.roster /
+// .determinations) so the screen doesn't have to re-fetch on mount.
+// `profiles` may be either an array of names or roster objects with `name`.
+export function computeStats({ profiles, determinations }) {
+  const names = (profiles || []).map((p) => (typeof p === 'string' ? p : p.name));
+  const rows = (determinations || []);
+  const memberRows = names.map((name) => computeMember(name, rows));
   const leader = pickLeader(memberRows);
   const members = rankMembers(memberRows);
-  const coDeterminations = determinations.filter(
-    (d) => (d.winners || []).length > 1,
-  ).length;
-
+  const coDeterminations = rows.filter((d) => (d.winners || []).length > 1).length;
   return {
     leader,
     members,
     notable: { coDeterminations },
   };
+}
+
+export async function loadStats() {
+  const [profiles, determinations] = await Promise.all([
+    listProfiles(),
+    listDeterminations(),
+  ]);
+  return computeStats({ profiles, determinations });
 }

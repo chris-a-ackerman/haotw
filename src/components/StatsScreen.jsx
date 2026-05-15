@@ -4,8 +4,7 @@
 import React from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { loadStats } from '../lib/stats.js';
-import { listProfilesWithPhotos } from '../lib/claims.js';
+import { computeStats } from '../lib/stats.js';
 import { useAppContext } from '../context/AppContext.jsx';
 import HybridProfileSheet from './HybridProfileSheet.jsx';
 
@@ -78,9 +77,7 @@ function Rise({ delay, children, as = 'div', className = '', ...rest }) {
 
 function StatsScreen() {
   const navigate = useNavigate();
-  const { determinations } = useAppContext();
-  const [stats, setStats] = React.useState(null);
-  const [photoByName, setPhotoByName] = React.useState(() => new Map());
+  const { determinations, roster } = useAppContext();
   const [searchParams, setSearchParams] = useSearchParams();
   const selectedHybridName = searchParams.get('profile');
 
@@ -94,19 +91,13 @@ function StatsScreen() {
     });
   }, [navigate, selectedHybridName]);
 
-  React.useEffect(() => {
-    let cancelled = false;
-    loadStats()
-      .then((s) => { if (!cancelled) setStats(s); })
-      .catch((err) => { console.warn('loadStats failed', err); });
-    listProfilesWithPhotos()
-      .then((rows) => {
-        if (cancelled) return;
-        setPhotoByName(new Map((rows || []).map(r => [r.name, r.photoUrl || null])));
-      })
-      .catch((err) => { console.warn('listProfilesWithPhotos failed', err); });
-    return () => { cancelled = true; };
-  }, []);
+  const stats = React.useMemo(() => {
+    if (!roster) return null;
+    return computeStats({ profiles: roster, determinations });
+  }, [roster, determinations]);
+  const photoByName = React.useMemo(() => (
+    new Map((roster || []).map(r => [r.name, r.photoUrl || null]))
+  ), [roster]);
 
   const today = new Date();
   const todayLong = formatLong(today);

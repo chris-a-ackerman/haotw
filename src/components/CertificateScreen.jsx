@@ -79,24 +79,25 @@ function ChromedCertificate({ entry, returnTo }) {
 
 function CertificateScreen() {
   const { number } = useParams();
-  const { determinations, refreshDeterminations } = useAppContext();
+  const { determinations } = useAppContext();
   const location = useLocation();
   const [localRows, setLocalRows] = React.useState(null);
 
-  // On a hard refresh of /certificate/:number, AppContext's determinations may
-  // be empty (auth still loading or the home effect hasn't fired). Pull our
-  // own copy as a fallback so the screen stands alone.
+  // /certificate (no number) is mounted outside AuthGate as a public share
+  // link, so determinations may be empty here. Fall back to a one-shot fetch
+  // for that case. /certificate/:number is gated by AuthGate, so context is
+  // already populated by App.jsx and this effect is a no-op.
+  const needsFallback = !determinations || determinations.length === 0;
   React.useEffect(() => {
-    if (determinations && determinations.length > 0) return;
+    if (!needsFallback) return;
     let cancelled = false;
     listDeterminations()
       .then((rows) => { if (!cancelled) setLocalRows(rows); })
       .catch(() => { if (!cancelled) setLocalRows([]); });
-    if (refreshDeterminations) refreshDeterminations();
     return () => { cancelled = true; };
-  }, [determinations, refreshDeterminations]);
+  }, [needsFallback]);
 
-  const rows = (determinations && determinations.length > 0) ? determinations : (localRows || []);
+  const rows = needsFallback ? (localRows || []) : determinations;
 
   if (!number) {
     return <StandaloneCertificate entry={rows[0] || null} />;

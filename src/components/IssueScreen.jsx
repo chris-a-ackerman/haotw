@@ -7,8 +7,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { supabase, isLive } from '../lib/supabase.js';
-import { createDetermination, listDeterminations } from '../lib/records.js';
-import { listProfilesWithPhotos } from '../lib/claims.js';
+import { createDetermination } from '../lib/records.js';
 import { useAppContext } from '../context/AppContext.jsx';
 
 const ISSUE = {
@@ -141,35 +140,26 @@ function ConfirmModal({ open, recipients, awardNo, onConfirm, onCancel }) {
 }
 
 function IssueScreen() {
-  const { session: issuer } = useAppContext();
+  const { session: issuer, roster, determinations } = useAppContext();
   const [selected, setSelected] = React.useState([]);
   const [speech, setSpeech] = React.useState('');
   const [genState, setGenState] = React.useState('idle');
   const [generated, setGenerated] = React.useState('');
   const [confirmOpen, setConfirmOpen] = React.useState(false);
   const [filed, setFiled] = React.useState(false);
-  const [members, setMembers] = React.useState([]);
-  const [awardNo, setAwardNo] = React.useState(null);
-  const [nextDeterminationNumber, setNextDeterminationNumber] = React.useState(null);
 
-  React.useEffect(() => {
-    let cancelled = false;
-    listProfilesWithPhotos().then(rows => {
-      if (cancelled) return;
-      setMembers(rows.map(({ name, photoUrl }) => ({
-        id: idFor(name),
-        name,
-        initials: initialsFor(name),
-        photoUrl,
-      })));
-    });
-    listDeterminations().then(records => {
-      if (cancelled) return;
-      setAwardNo(records.length + 1);
-      setNextDeterminationNumber(records.length ? records[0].determinationNumber + 1 : 1);
-    });
-    return () => { cancelled = true; };
-  }, []);
+  const members = React.useMemo(() => (
+    (roster || []).map(({ name, photoUrl }) => ({
+      id: idFor(name),
+      name,
+      initials: initialsFor(name),
+      photoUrl,
+    }))
+  ), [roster]);
+  const awardNo = determinations.length + 1;
+  const nextDeterminationNumber = determinations.length
+    ? determinations[0].determinationNumber + 1
+    : 1;
 
   const issuedBy = issuer && issuer.name
     ? { ...ISSUE.issuedBy, name: issuer.name, short: shortName(issuer.name) }

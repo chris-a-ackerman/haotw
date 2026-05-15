@@ -4,7 +4,6 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { listDeterminations } from '../lib/records.js';
 import { useAppContext } from '../context/AppContext.jsx';
 
 const NOTICE_DATA = {
@@ -195,18 +194,11 @@ function Letter({ daysKey, isChampion, number }) {
 }
 
 function NoticeScreen() {
-  const { isChampion } = useAppContext();
+  const { isChampion, determinations } = useAppContext();
   const [days, setDays] = React.useState(1);
-  const [pendingDeterminationNumber, setPendingDeterminationNumber] = React.useState(null);
-
-  React.useEffect(() => {
-    let cancelled = false;
-    listDeterminations().then(records => {
-      if (cancelled) return;
-      setPendingDeterminationNumber(records.length ? records[0].determinationNumber + 1 : 1);
-    });
-    return () => { cancelled = true; };
-  }, []);
+  const pendingDeterminationNumber = determinations.length
+    ? determinations[0].determinationNumber + 1
+    : 1;
 
   return (
     <div className="hahome">

@@ -70,9 +70,9 @@ async function fetchProfile(userId) {
   let timer;
   const timeout = new Promise((resolve) => {
     timer = setTimeout(() => {
-      console.warn('profile fetch timed out after 2000ms');
+      console.warn('profile fetch timed out after 8000ms');
       resolve({ data: null, error: { code: 'TIMEOUT' } });
-    }, 2000);
+    }, 8000);
   });
   const { data, error } = await Promise.race([query, timeout]);
   clearTimeout(timer);
@@ -380,9 +380,23 @@ export async function updatePhoto({ email, photo }) {
   return { ok: true, session: sessionFromUser(user, profile) };
 }
 
+// Events that consumers always need to know about, even when the user_id
+// matches the previous emit. SIGNED_IN/OUT are state transitions; PASSWORD_
+// RECOVERY pivots the UI into reset mode.
+const ALWAYS_EMIT_EVENTS = new Set(['SIGNED_IN', 'SIGNED_OUT', 'PASSWORD_RECOVERY']);
+
 export function onAuthStateChange(callback) {
   if (!isLive()) return { unsubscribe: () => {} };
+  // Supabase-js fires a stream of events per session: INITIAL_SESSION,
+  // SIGNED_IN, then TOKEN_REFRESHED / USER_UPDATED on a timer. Each one used
+  // to trigger a fetchProfile + new session object, which re-fired every
+  // session-keyed effect in App.jsx and amplified into a query cascade.
+  // Dedup by user_id so only real identity transitions get through.
+  let lastUserId = undefined;
   const { data } = supabase.auth.onAuthStateChange((event, session) => {
+    const userId = session?.user?.id ?? null;
+    if (userId === lastUserId && !ALWAYS_EMIT_EVENTS.has(event)) return;
+    lastUserId = userId;
     if (!session) { callback(null, event); return; }
     // Defer the profile fetch out of the callback — supabase-js holds an
     // internal auth lock while running onAuthStateChange callbacks, and any

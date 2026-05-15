@@ -7,6 +7,7 @@ import React from 'react';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import * as Auth from './lib/auth.js';
 import { listDeterminations } from './lib/records.js';
+import { listProfilesWithPhotos } from './lib/claims.js';
 import { getTree, isAdmin as computeIsAdmin } from './lib/tree.js';
 
 import { AppProvider } from './context/AppContext.jsx';
@@ -33,6 +34,7 @@ function App() {
   const [determinations, setDeterminations] = React.useState([]);
   const [claimSkipped, setClaimSkipped] = React.useState(false);
   const [treeBundle, setTreeBundle] = React.useState(null);
+  const [roster, setRoster] = React.useState(null);
   const location = useLocation();
 
   const refreshDeterminations = React.useCallback(async () => {
@@ -48,6 +50,14 @@ function App() {
       setTreeBundle(await getTree());
     } catch (err) {
       console.warn('getTree() failed:', err);
+    }
+  }, []);
+
+  const refreshRoster = React.useCallback(async () => {
+    try {
+      setRoster(await listProfilesWithPhotos());
+    } catch (err) {
+      console.warn('listProfilesWithPhotos() failed:', err);
     }
   }, []);
 
@@ -79,29 +89,39 @@ function App() {
 
   // Load the official record once the user is signed in, and again whenever
   // they land on home or certificate views — that's how a freshly filed
-  // determination propagates back without a manual reload.
+  // determination propagates back without a manual reload. Effects key on
+  // user_id, not session identity, so token-refresh events don't re-fire them.
+  const userId = session?.user_id || null;
   React.useEffect(() => {
-    if (!session) return;
+    if (!userId) return;
     refreshDeterminations();
-  }, [session, refreshDeterminations]);
+  }, [userId, refreshDeterminations]);
   React.useEffect(() => {
-    if (!session) return;
+    if (!userId) return;
     if (location.pathname !== '/' && !location.pathname.startsWith('/certificate')) return;
     refreshDeterminations();
-  }, [location.pathname, session, refreshDeterminations]);
+  }, [location.pathname, userId, refreshDeterminations]);
 
   // Load the coaching tree once on sign-in, and again when navigating into any
   // /tree route — that lets the admin surface push fresh writes into the read
   // views without a manual reload.
   React.useEffect(() => {
-    if (!session) return;
+    if (!userId) return;
     refreshTree();
-  }, [session, refreshTree]);
+  }, [userId, refreshTree]);
   React.useEffect(() => {
-    if (!session) return;
+    if (!userId) return;
     if (!location.pathname.startsWith('/tree')) return;
     refreshTree();
-  }, [location.pathname, session, refreshTree]);
+  }, [location.pathname, userId, refreshTree]);
+
+  // Roster (14-name member list with claim/photo/strava/achievement) is read
+  // by IssueScreen, StatsScreen, and HybridProfileSheet. Hoisted here so each
+  // screen reads from context instead of refetching on mount.
+  React.useEffect(() => {
+    if (!userId) return;
+    refreshRoster();
+  }, [userId, refreshRoster]);
 
   const onSignOut = React.useCallback(async () => {
     await Auth.signOut();
@@ -109,6 +129,7 @@ function App() {
     setClaimSkipped(false);
     setSession(null);
     setTreeBundle(null);
+    setRoster(null);
   }, []);
 
   const onClaimed = React.useCallback((profile) => {
@@ -140,6 +161,8 @@ function App() {
     isAdmin,
     treeBundle,
     refreshTree,
+    roster,
+    refreshRoster,
     onSignOut,
     onClaimed,
   };

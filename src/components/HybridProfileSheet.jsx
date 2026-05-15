@@ -9,7 +9,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { listProfilesWithPhotos } from '../lib/claims.js';
+import { useAppContext } from '../context/AppContext.jsx';
 import { slugify } from '../lib/certificate.js';
 
 const ROMAN_NUMERALS = [
@@ -41,15 +41,7 @@ function joinNames(winners) {
 }
 
 function HybridProfileSheet({ open, hybridName, determinations, onClose, onViewCertificate }) {
-  const [roster, setRoster] = React.useState(null);
-
-  React.useEffect(() => {
-    let cancelled = false;
-    listProfilesWithPhotos()
-      .then((rows) => { if (!cancelled) setRoster(rows); })
-      .catch((err) => { console.warn('listProfilesWithPhotos failed', err); });
-    return () => { cancelled = true; };
-  }, []);
+  const { roster } = useAppContext();
 
   React.useEffect(() => {
     if (!open) return;

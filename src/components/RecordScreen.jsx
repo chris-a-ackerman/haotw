@@ -4,7 +4,7 @@
 
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { listDeterminations } from '../lib/records.js';
+import { useAppContext } from '../context/AppContext.jsx';
 
 const delay = (n) => ({ style: { animationDelay: `${n}ms` } });
 
@@ -132,21 +132,13 @@ function Entry({ entry, expanded, onToggle, onViewCertificate, riseDelay }) {
 
 function RecordScreen() {
   const navigate = useNavigate();
+  const { determinations: records } = useAppContext();
   const [openNumber, setOpenNumber] = React.useState(null);
-  const [records, setRecords] = React.useState([]);
   const today = React.useMemo(() => formatToday(), []);
 
   const onViewCertificate = React.useCallback((entry) => {
     navigate(`/certificate/${entry.determinationNumber}`, { state: { from: 'archive' } });
   }, [navigate]);
-
-  React.useEffect(() => {
-    let cancelled = false;
-    listDeterminations().then((rows) => {
-      if (!cancelled) setRecords(rows);
-    });
-    return () => { cancelled = true; };
-  }, []);
 
   return (
     <div className="harec">
