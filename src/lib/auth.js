@@ -94,10 +94,22 @@ async function upsertProfile(userId, patch) {
 /* ---------------- public API ----------------------------------------- */
 export async function loadSession() {
   if (!isLive()) return loadSessionLocal();
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) return null;
-  const profile = await fetchProfile(session.user.id);
-  return sessionFromUser(session.user, profile);
+  try {
+    const { data: { session }, error } = await supabase.auth.getSession();
+    if (error) throw error;
+    if (!session) return null;
+    const profile = await fetchProfile(session.user.id);
+    return sessionFromUser(session.user, profile);
+  } catch (err) {
+    // Stale/revoked refresh token in localStorage. Clear it locally so the
+    // user lands on AuthScreen clean instead of seeing a console error.
+    const msg = (err && (err.message || String(err))) || '';
+    if (/refresh token|invalid.*token|jwt/i.test(msg) || err?.name === 'AuthApiError') {
+      try { await supabase.auth.signOut({ scope: 'local' }); } catch {}
+      return null;
+    }
+    throw err;
+  }
 }
 
 export async function signIn({ email, password }) {

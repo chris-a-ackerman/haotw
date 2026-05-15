@@ -64,7 +64,8 @@ function App() {
       })
       .catch((err) => {
         if (cancelled) return;
-        console.error('Auth.loadSession() failed:', err);
+        console.warn('Auth.loadSession() failed; starting unauthenticated.', err);
+        setSession(null);
         setAuthReady(true);
       });
     const sub = Auth.onAuthStateChange((s, event) => {
