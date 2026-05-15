@@ -32,6 +32,7 @@ export async function listProfiles() {
   const { data, error } = await supabase
     .from('hybrid_profiles')
     .select('display_name')
+    .eq('is_member', true)
     .order('id', { ascending: true });
   if (error) {
     logSupabaseError('listProfiles failed, falling back to constant', error);
@@ -69,7 +70,7 @@ export async function listProfilesWithPhotos() {
   const [{ data: profiles, error: pErr },
          { data: claims,   error: cErr },
          { data: rows,     error: rErr }] = await Promise.all([
-    supabase.from('hybrid_profiles').select('id, display_name').order('id'),
+    supabase.from('hybrid_profiles').select('id, display_name').eq('is_member', true).order('id'),
     supabase.from('profile_claims').select('hybrid_profile_id, user_id'),
     supabase.from('profiles').select('user_id, photo_url, strava_url, achievement'),
   ]);
@@ -105,7 +106,7 @@ export async function unclaimed() {
   // Anti-join: profiles minus those with a claim row.
   const [{ data: profiles, error: pErr },
          { data: claims,   error: cErr }] = await Promise.all([
-    supabase.from('hybrid_profiles').select('id, display_name').order('id'),
+    supabase.from('hybrid_profiles').select('id, display_name').eq('is_member', true).order('id'),
     supabase.from('profile_claims').select('hybrid_profile_id'),
   ]);
   if (pErr || cErr) {
@@ -134,6 +135,7 @@ export async function claim(profile, email) {
     .from('hybrid_profiles')
     .select('id')
     .eq('display_name', profile)
+    .eq('is_member', true)
     .single();
   if (lookupErr || !row) return { ok: false, error: 'Profile not found.' };
   const { error } = await supabase
