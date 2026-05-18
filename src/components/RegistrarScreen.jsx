@@ -17,7 +17,7 @@ const delay = (n) => ({ style: { animationDelay: `${n}ms` } });
 
 const TABS = [
   { id: 'people',        label: 'People' },
-  { id: 'distinctions',  label: 'Distinctions' },
+  { id: 'distinctions',  label: 'Labels' },
   { id: 'relationships', label: 'Relationships' },
 ];
 
@@ -46,9 +46,9 @@ function ExciseModal({ open, label, expected, onConfirm, onClose }) {
           <span className="haregistrar__modal-stamp haregistrar__modal-stamp--warn">Excision</span>
           <button type="button" className="haregistrar__modal-close" onClick={onClose} aria-label="Close">×</button>
         </header>
-        <h2 className="haregistrar__modal-title">Type {label} to excise from the Tree.</h2>
+        <h2 className="haregistrar__modal-title">Type {label} to delete from the Tree.</h2>
         <p className="haregistrar__modal-body">
-          This cannot be undone. Cascades to all relationships and distinction memberships
+          This cannot be undone. Cascades to all relationships and label memberships
           on record.
         </p>
         <input
@@ -70,7 +70,7 @@ function ExciseModal({ open, label, expected, onConfirm, onClose }) {
             className="haregistrar__btn haregistrar__btn--danger"
             onClick={onConfirm}
             disabled={!matches}
-          >Excise</button>
+          >Delete</button>
         </div>
       </div>
     </div>
@@ -122,10 +122,10 @@ function PeopleTab({ people, relationships, distinctions, personDistinctionsByPe
     if (!excising) return;
     const res = await Tree.deletePerson(excising.id);
     if (res.ok) {
-      setFlash({ kind: 'ok', text: 'Excised.' });
+      setFlash({ kind: 'ok', text: 'Deleted.' });
       await onChanged();
     } else {
-      setFlash({ kind: 'err', text: res.error || 'Could not excise.' });
+      setFlash({ kind: 'err', text: res.error || 'Could not delete.' });
     }
     setExcising(null);
   }
@@ -141,7 +141,7 @@ function PeopleTab({ people, relationships, distinctions, personDistinctionsByPe
           type="button"
           className="haregistrar__btn haregistrar__btn--primary"
           onClick={() => setEditing({ mode: 'create' })}
-        >+ Inscribe a Person</button>
+        >+ Add a person</button>
       </div>
 
       {flash ? (
@@ -159,7 +159,7 @@ function PeopleTab({ people, relationships, distinctions, personDistinctionsByPe
           >
             {s === 'name' ? 'Name' :
              s === 'member' ? 'Member' :
-             s === 'dist' ? 'Distinctions' : 'Recruits'}
+             s === 'dist' ? 'Labels' : 'Recruits'}
           </button>
         ))}
       </div>
@@ -183,7 +183,7 @@ function PeopleTab({ people, relationships, distinctions, personDistinctionsByPe
                   <span className={'haregistrar__badge' + (p.isMember ? '' : ' haregistrar__badge--quiet')}>
                     {p.isMember ? 'Member' : 'Non-member'}
                   </span>
-                  <span>{distCount} distinction{distCount === 1 ? '' : 's'}</span>
+                  <span>{distCount} label{distCount === 1 ? '' : 's'}</span>
                   <span>{recCount} recruit{recCount === 1 ? '' : 's'}</span>
                 </div>
               </div>
@@ -192,12 +192,12 @@ function PeopleTab({ people, relationships, distinctions, personDistinctionsByPe
                   type="button"
                   className="haregistrar__btn haregistrar__btn--ghost haregistrar__btn--small"
                   onClick={() => setEditing({ mode: 'edit', person: p })}
-                >Amend</button>
+                >Edit</button>
                 <button
                   type="button"
                   className="haregistrar__btn haregistrar__btn--danger haregistrar__btn--small"
                   onClick={() => setExcising(p)}
-                >Excise</button>
+                >Delete</button>
               </div>
             </li>
           );
@@ -215,7 +215,7 @@ function PeopleTab({ people, relationships, distinctions, personDistinctionsByPe
           onClose={() => setEditing(null)}
           onSaved={async ({ mode }) => {
             setEditing(null);
-            setFlash({ kind: 'ok', text: mode === 'edit' ? 'Amended.' : 'Inscribed.' });
+            setFlash({ kind: 'ok', text: mode === 'edit' ? 'Updated.' : 'Saved.' });
             await onChanged();
           }}
           onCreateDistinction={onCreateDistinctionInline}
@@ -244,10 +244,10 @@ function DistinctionsTab({ distinctions, onChanged, flash, setFlash, people }) {
     if (!excising) return;
     const res = await Tree.deleteDistinction(excising.id);
     if (res.ok) {
-      setFlash({ kind: 'ok', text: 'Excised. Members no longer bear this Distinction.' });
+      setFlash({ kind: 'ok', text: 'Deleted. Members no longer bear this Distinction.' });
       await onChanged();
     } else {
-      setFlash({ kind: 'err', text: res.error || 'Could not excise.' });
+      setFlash({ kind: 'err', text: res.error || 'Could not delete.' });
     }
     setExcising(null);
   }
@@ -256,14 +256,14 @@ function DistinctionsTab({ distinctions, onChanged, flash, setFlash, people }) {
     <section className="haregistrar__tab">
       <div className="haregistrar__tab-head">
         <div>
-          <div className="haregistrar__tab-title">Distinctions on the Tree</div>
+          <div className="haregistrar__tab-title">Labels on the Tree</div>
           <div className="haregistrar__tab-sub">{distinctions.length} authored.</div>
         </div>
         <button
           type="button"
           className="haregistrar__btn haregistrar__btn--primary"
           onClick={() => setEditing({ mode: 'create' })}
-        >+ Author a Distinction</button>
+        >+ Add a label</button>
       </div>
 
       {flash ? (
@@ -294,12 +294,12 @@ function DistinctionsTab({ distinctions, onChanged, flash, setFlash, people }) {
               <Link
                 to={`/tree/admin/distinctions/${d.id}`}
                 className="haregistrar__btn haregistrar__btn--ghost haregistrar__btn--small"
-              >Detail</Link>
+              >View Details</Link>
               <button
                 type="button"
                 className="haregistrar__btn haregistrar__btn--danger haregistrar__btn--small"
                 onClick={() => setExcising(d)}
-              >Excise</button>
+              >Delete</button>
             </div>
           </li>
         ))}
@@ -351,7 +351,7 @@ function DistinctionDetail({ distinctionId, distinctions, people, onChanged, fla
       <section className="haregistrar__tab">
         <div className="haregistrar__state">Distinction not found.</div>
         <Link to="/tree/admin?tab=distinctions" className="haregistrar__btn haregistrar__btn--ghost">
-          ← Distinctions
+          ← Labels
         </Link>
       </section>
     );
@@ -378,11 +378,11 @@ function DistinctionDetail({ distinctionId, distinctions, people, onChanged, fla
     const res = await Tree.deleteDistinction(distinction.id);
     setExcising(false);
     if (res.ok) {
-      setFlash({ kind: 'ok', text: 'Excised. Members no longer bear this Distinction.' });
+      setFlash({ kind: 'ok', text: 'Deleted. Members no longer bear this Label.' });
       await onChanged();
       navigate('/tree/admin?tab=distinctions');
     } else {
-      setFlash({ kind: 'err', text: res.error || 'Could not excise.' });
+      setFlash({ kind: 'err', text: res.error || 'Could not delete.' });
     }
   }
 
@@ -391,7 +391,7 @@ function DistinctionDetail({ distinctionId, distinctions, people, onChanged, fla
       <div className="haregistrar__tab-head">
         <div>
           <Link to="/tree/admin?tab=distinctions" className="haregistrar__crumb">
-            ← Distinctions
+            ← Labels
           </Link>
           <div className="haregistrar__tab-title">{distinction.name}</div>
           <div className="haregistrar__tab-sub">
@@ -409,12 +409,12 @@ function DistinctionDetail({ distinctionId, distinctions, people, onChanged, fla
             type="button"
             className="haregistrar__btn haregistrar__btn--ghost"
             onClick={() => setEditing(true)}
-          >Amend metadata</button>
+          >Edit</button>
           <button
             type="button"
             className="haregistrar__btn haregistrar__btn--danger"
             onClick={() => setExcising(true)}
-          >Excise</button>
+          >Delete</button>
         </div>
       </div>
 
@@ -444,7 +444,7 @@ function DistinctionDetail({ distinctionId, distinctions, people, onChanged, fla
             className="haregistrar__btn haregistrar__btn--ghost"
             onClick={() => setSelected(initialMembers)}
             disabled={saving}
-          >Revert</button>
+          >Undo</button>
           <button
             type="button"
             className="haregistrar__btn haregistrar__btn--primary"
@@ -462,7 +462,7 @@ function DistinctionDetail({ distinctionId, distinctions, people, onChanged, fla
           onClose={() => setEditing(false)}
           onSaved={async () => {
             setEditing(false);
-            setFlash({ kind: 'ok', text: 'Amended.' });
+            setFlash({ kind: 'ok', text: 'Updated.' });
             await onChanged();
           }}
         />
@@ -502,25 +502,25 @@ function RelationshipsTab({ people, relationships, onChanged, flash, setFlash })
   async function handleSaveNote(edge, newNote) {
     const res = await Tree.updateRelationship(edge.id, { note: newNote });
     if (res.ok) {
-      setFlash({ kind: 'ok', text: 'Note amended.' });
+      setFlash({ kind: 'ok', text: 'Note saved.' });
       await onChanged();
     } else {
-      setFlash({ kind: 'err', text: res.error || 'Could not amend note.' });
+      setFlash({ kind: 'err', text: res.error || 'Could not save note.' });
     }
     setEditing(null);
   }
 
   async function handleDelete(edge) {
     if (edge.kind === 'strava_dm') {
-      setFlash({ kind: 'err', text: 'Lateral connections are seeded once and cannot be excised here.' });
+      setFlash({ kind: 'err', text: 'Lateral connections are seeded once and cannot be deleted here.' });
       return;
     }
     const res = await Tree.deleteRelationship(edge.id);
     if (res.ok) {
-      setFlash({ kind: 'ok', text: 'Excised.' });
+      setFlash({ kind: 'ok', text: 'Deleted.' });
       await onChanged();
     } else {
-      setFlash({ kind: 'err', text: res.error || 'Could not excise.' });
+      setFlash({ kind: 'err', text: res.error || 'Could not delete.' });
     }
   }
 
@@ -551,7 +551,7 @@ function RelationshipsTab({ people, relationships, onChanged, flash, setFlash })
           type="button"
           className="haregistrar__btn haregistrar__btn--primary"
           onClick={() => setAdding({ kind: 'recruited', fromId: null, toId: null, note: '' })}
-        >+ Inscribe an Edge</button>
+        >+ Add a relationship</button>
       </div>
 
       {flash ? (
@@ -658,13 +658,13 @@ function RelationshipsTab({ people, relationships, onChanged, flash, setFlash })
                       type="button"
                       className="haregistrar__btn haregistrar__btn--ghost haregistrar__btn--small"
                       onClick={() => setEditing({ edgeId: r.id, note: r.note || '' })}
-                    >Note</button>
+                    >Add Note</button>
                     {!isLateral ? (
                       <button
                         type="button"
                         className="haregistrar__btn haregistrar__btn--danger haregistrar__btn--small"
                         onClick={() => handleDelete(r)}
-                      >Excise</button>
+                      >Delete</button>
                     ) : null}
                   </>
                 )}
@@ -831,7 +831,7 @@ function RegistrarScreen() {
         </div>
         <h1 className="haregistrar__title haregistrar__rise" {...delay(120)}>Administration</h1>
         <p className="haregistrar__subtitle haregistrar__rise" {...delay(220)}>
-          Inscription, amendment, and excision of records.
+          Creating, editing, and deleting of records.
         </p>
       </header>
 

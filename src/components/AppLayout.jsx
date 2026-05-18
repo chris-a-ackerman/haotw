@@ -15,7 +15,7 @@ const NAV_ITEMS_BASE = [
 ];
 const NAV_ITEM_CROWN = { id: 'crown', path: '/issue',       label: 'Issue Determination',     numeral: 'IV' };
 const NAV_ITEM_TREE  = { id: 'tree',  path: '/tree',        label: 'Coaching Tree',           numeral: 'V'  };
-const NAV_ITEM_ADMIN = { id: 'admin', path: '/tree/admin',  label: 'Office of the Registrar', numeral: 'VI' };
+const NAV_ITEM_ADMIN = { id: 'admin', path: '/tree/admin',  label: 'Coaching Tree Admin', numeral: 'VI' };
 
 function HamburgerButton({ onOpen }) {
   return (

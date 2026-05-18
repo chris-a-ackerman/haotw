@@ -99,7 +99,7 @@ function RegistrarPersonForm({
       const res = await Tree.createPerson({
         displayName: trimmed, isMember, photoUrl: photoUrl.trim() || null,
       });
-      if (!res.ok) { setError(res.error || 'Could not inscribe.'); setSaving(false); return; }
+      if (!res.ok) { setError(res.error || 'Could not add.'); setSaving(false); return; }
       personId = res.person.id;
     }
 
@@ -180,11 +180,11 @@ function RegistrarPersonForm({
         className="haregistrar__modal haregistrar__modal--wide"
         role="dialog"
         aria-modal="true"
-        aria-label={editing ? 'Amend person' : 'Inscribe a person'}
+        aria-label={editing ? 'Edit person' : 'Add a person'}
       >
         <header className="haregistrar__modal-head">
           <span className="haregistrar__modal-stamp">
-            {editing ? 'Amendment' : 'New Inscription'}
+            {editing ? 'Amendment' : 'New Record'}
           </span>
           <button
             type="button"
@@ -194,7 +194,7 @@ function RegistrarPersonForm({
           >×</button>
         </header>
         <h2 className="haregistrar__modal-title">
-          {editing ? `Amend ${initialPerson.displayName}` : 'Inscribe a Person'}
+          {editing ? `Edit ${initialPerson.displayName}` : 'Add a Person'}
         </h2>
 
         <form className="haregistrar__form" onSubmit={handleSubmit}>
@@ -402,8 +402,8 @@ function RegistrarPersonForm({
               disabled={saving}
             >
               {saving
-                ? (editing ? 'Amending…' : 'Inscribing…')
-                : (editing ? 'Amend' : 'Inscribe')}
+                ? (editing ? 'Editing…' : 'Adding…')
+                : (editing ? 'Edit' : 'Add')}
             </button>
           </div>
         </form>

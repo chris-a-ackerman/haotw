@@ -225,7 +225,7 @@
   left: 8px;
   top: 4px;
   bottom: 14px;
-  border-left: 0.5px dotted var(--rule-soft);
+  border-left: 0.5px solid var(--ink-3);
 }
 .hatree__children--root::before { display: none; }
 .hatree__children--root { padding-left: 0; }
@@ -304,23 +304,25 @@
 }
 .hatree__chip {
   appearance: none;
-  border: 0;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 4px;
   padding: 2px 6px;
-  background: var(--chip-color, var(--baa-blue));
-  color: #fff;
+  color: var(--chip-color, var(--baa-blue));
+  background: color-mix(in srgb, var(--chip-color, var(--baa-blue)) 6%, transparent);
+  border: 0.5px solid var(--chip-color, var(--baa-blue));
   font-family: var(--font-sans);
   font-weight: 700;
   font-size: 8.5px;
   letter-spacing: 0.20em;
   text-transform: uppercase;
   border-radius: 1px;
-  transition: opacity var(--dur-quick) var(--ease-doc);
+  transition: background var(--dur-quick) var(--ease-doc);
 }
-.hatree__chip:hover { opacity: 0.86; }
+.hatree__chip:hover {
+  background: color-mix(in srgb, var(--chip-color, var(--baa-blue)) 12%, transparent);
+}
 .hatree__chip-icon {
   font-size: 10px;
   letter-spacing: 0;
@@ -413,8 +415,9 @@
   align-items: center;
   gap: 4px;
   padding: 2px 6px;
-  background: var(--chip-color, var(--baa-blue));
-  color: #fff;
+  color: var(--chip-color, var(--baa-blue));
+  background: color-mix(in srgb, var(--chip-color, var(--baa-blue)) 6%, transparent);
+  border: 0.5px solid var(--chip-color, var(--baa-blue));
   font-family: var(--font-sans);
   font-weight: 700;
   font-size: 8.5px;
