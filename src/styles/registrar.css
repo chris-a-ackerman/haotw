@@ -955,3 +955,28 @@
   transform-origin: left center;
   animation: haregistrar-draw 0.7s var(--ease-doc) both;
 }
+
+/* ---------- responsive: collapse table rows on narrow viewports ---- */
+@media (max-width: 720px) {
+  .haregistrar__trow {
+    grid-template-columns: auto 1fr;
+    column-gap: 12px;
+    row-gap: 8px;
+  }
+  .haregistrar__trow-actions {
+    grid-column: 1 / -1;
+    justify-content: flex-end;
+  }
+  .haregistrar__trow--edge {
+    grid-template-columns: 1fr;
+  }
+  .haregistrar__edge-pair {
+    flex-wrap: wrap;
+  }
+  .haregistrar__trow > .haregistrar__trow-chip {
+    width: 120px;
+  }
+  .haregistrar__trow:has(> .haregistrar__trow-chip) {
+    align-items: start;
+  }
+}
